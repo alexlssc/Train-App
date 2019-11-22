@@ -15,6 +15,10 @@ export class LoginPage extends React.Component{
     }
 
     render() {
+        const isInvalid =
+            this.state.username === '' ||
+            this.state.password === '';
+
         return (
             <div>
                 <MuiThemeProvider>
@@ -28,8 +32,7 @@ export class LoginPage extends React.Component{
                                 (event, newValue) => this.setState({password: newValue})
                             }/>
                             <br/>
-                            <RaisedButton id="LoginSubmitButton" label="Submit" primary={true} style={Object.assign({}, styles.center, styles.buttonStyle)}/>
-
+                            <RaisedButton disabled={isInvalid} id="LoginSubmitButton" label="Submit" primary={true} style={Object.assign({}, styles.center, styles.buttonStyle)}/>
                     </div>
                 </MuiThemeProvider>
             </div>
