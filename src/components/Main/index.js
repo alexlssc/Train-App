@@ -1,13 +1,15 @@
 import React from 'react'
+import SignOutButton from '../SignOut'
+import { withAuthorization } from '../Session'
 
-export class MainPage extends React.Component{
+const MainPage = () => (
+    <div>
+        <h1>Main Page</h1>
+        <h2>{process.env.REACT_APP_SECRET_VALUE}</h2>
+        <SignOutButton />
+    </div>
+);
 
-    render() {
-        return(
-            <div>
-                <h1>Main Page</h1>
-                <h2>{process.env.REACT_APP_SECRET_VALUE}</h2>
-            </div>
-        )
-    }
-}
+const condition = authUser => !!authUser;
+
+export default withAuthorization(condition)(MainPage);
