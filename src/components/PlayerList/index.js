@@ -2,13 +2,13 @@ import React from 'react'
 import { withAuthorization } from '../Session'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TopBar from "../AppBar";
-import MainContent from "./content";
+import MainContentDashboard from "./content";
 
 
 const MainPage = () => (
     <div>
         <MuiThemeProvider>
-            <TopBar content={<MainContent/>}/>
+            <TopBar content={<MainContentDashboard/>}/>
         </MuiThemeProvider>
     </div>
 );

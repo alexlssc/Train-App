@@ -85,7 +85,7 @@ function ResponsiveDrawer(props) {
     return (
         <div className={classes.root}>
             <CssBaseline />
-            <AppBar position="fixed" className={classes.appBar}>
+            <AppBar className={classes.appBar}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -102,7 +102,6 @@ function ResponsiveDrawer(props) {
                 </Toolbar>
             </AppBar>
             <nav className={classes.drawer} aria-label="mailbox folders">
-                {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                 <Hidden smUp implementation="css">
                     <Drawer
                         container={container}
@@ -132,6 +131,10 @@ function ResponsiveDrawer(props) {
                     </Drawer>
                 </Hidden>
             </nav>
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                {props.content}
+            </main>
         </div>
     );
 }
