@@ -60,11 +60,11 @@ class SignInFormBase extends React.Component{
                 <MuiThemeProvider>
                     <div>
                         <AppBar title ='Login'/>
-                            <TextField id="loginBar" name="email" hintText= "Enter your email" floatingLabelText="Email" style={styles.center} onChange={this.onChange}/>
+                            <TextField id="loginBar" name="email" hintText= "Entrez votre adresse email" floatingLabelText="Email" style={styles.center} onChange={this.onChange}/>
                             <br/>
-                            <TextField id="passwordBar" type="password" name="password" hintText="Enter your password" floatingLabelText="Password" style={styles.center} onChange={this.onChange}/>
+                            <TextField id="passwordBar" type="password" name="password" hintText="Entrez votre mot de passe" floatingLabelText="Mot de passe" style={styles.center} onChange={this.onChange}/>
                             <br/>
-                            <RaisedButton disabled={isInvalid} id="LoginSubmitButton" label="Submit" primary={true} style={Object.assign({}, styles.center, styles.buttonStyle)} onClick={this.onClick}/>
+                            <RaisedButton disabled={isInvalid} id="LoginSubmitButton" label="Envoyer" primary={true} style={Object.assign({}, styles.center, styles.buttonStyle)} onClick={this.onClick}/>
                     </div>
                 </MuiThemeProvider>
             </div>

@@ -1,12 +1,16 @@
 import React from 'react'
 import SignOutButton from '../SignOut'
 import { withAuthorization } from '../Session'
+import AppBar from 'material-ui/AppBar';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 const MainPage = () => (
     <div>
-        <h1>Main Page</h1>
-        <h2>{process.env.REACT_APP_SECRET_VALUE}</h2>
-        <SignOutButton />
+        <MuiThemeProvider>
+            <AppBar display="flex" title="Train App">
+                <SignOutButton/>
+            </AppBar>
+        </MuiThemeProvider>
     </div>
 );
 
