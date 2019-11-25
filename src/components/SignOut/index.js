@@ -1,16 +1,15 @@
 import React from 'react';
 import { withFirebase } from '../Firebase';
-import Button from '@material-ui/core/Button';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
-const style = {
-    backgroundColor: 'transparent',
-    color: 'white',
-    height: 'auto'
-}
 
 const SignOutButton = ({ firebase }) => (
-    <Button type="button" style={style} onClick={firebase.doSignOut}>
-        Déconnexion
-    </Button>
+    <ListItem button key="deconnexion" onClick={firebase.doSignOut}>
+        <ListItemIcon><ExitToAppIcon/></ListItemIcon>
+        <ListItemText primary="Deconnexion" />
+    </ListItem>
 );
 export default withFirebase(SignOutButton);
