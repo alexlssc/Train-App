@@ -1,5 +1,6 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
+import { Link } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -16,6 +17,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import SignOutButton from '../SignOut';
+import * as ROUTES from "../../constants/routes";
 
 const drawerWidth = 240;
 
@@ -66,11 +68,11 @@ function ResponsiveDrawer(props) {
             <div className={classes.toolbar} />
             <Divider />
             <List>
-                <ListItem button key="dashboard">
+                <ListItem button component={Link} to={ROUTES.LANDING} key="dashboard">
                     <ListItemIcon><DashboardIcon/></ListItemIcon>
                     <ListItemText primary="Dashboard"/>
                 </ListItem>
-                <ListItem button key="listPlayer">
+                <ListItem button component={Link} to={ROUTES.PLAYER_LIST} key="listPlayer">
                     <ListItemIcon><PeopleIcon/></ListItemIcon>
                     <ListItemText primary="Liste Joueur"/>
                 </ListItem>
