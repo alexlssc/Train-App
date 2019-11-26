@@ -1,14 +1,14 @@
 import React from 'react'
 import { withAuthorization } from '../Session'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import TopBar from "../AppBar";
+import Skeleton from "../DisplaySkeleton";
 import MainContentDashboard from "./content";
 
 
 const MainPage = () => (
     <div>
         <MuiThemeProvider>
-            <TopBar content={<MainContentDashboard/>}/>
+            <Skeleton content={<MainContentDashboard/>}/>
         </MuiThemeProvider>
     </div>
 );

@@ -1,9 +1,20 @@
-import React from 'react'
+import React from 'react';
+import PlayerTable from "./table";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from '@material-ui/icons/Add';
+import './style.css'
 
 class MainContent extends React.Component{
-    render() {
-        return(<h1>This is the Player List Page</h1>);
 
+    render() {
+        return (
+            <div>
+                <PlayerTable/>
+                <Fab id="addPlayerButton" color="primary" aria-label="add">
+                    <AddIcon />
+                </Fab>
+            </div>
+        );
     }
 }
 
