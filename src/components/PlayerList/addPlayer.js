@@ -70,15 +70,7 @@ function AddPlayer(){
     const [secondName, setSecondName] = React.useState('');
     const [DOB, setDOB] = React.useState('01/02/2018');
     const [positions, setPositions] = React.useState([
-        {
-            position: 'GB'
-        },
-        {
-            position: 'DC'
-        },
-        {
-            position: 'AG'
-        }
+
     ]);
 
     const handlePosition = e => {
@@ -150,7 +142,7 @@ function AddPlayer(){
                                     onChange={handlePosition}
                                 >
                                     {POSITION.POSITION.map((position, index) => (
-                                        <ListItem key={index} value={position}>{position}</ListItem>
+                                        <MenuItem key={index} value={position}>{position}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
