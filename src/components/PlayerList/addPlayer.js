@@ -15,12 +15,14 @@ import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
+import Button from '@material-ui/core/Button';
 import DateFnsUtils from '@date-io/date-fns';
 import * as POSITION from '../../constants/positions'
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+
 
 const useStyles = makeStyles(theme => ({
 
@@ -45,6 +47,10 @@ const useStyles = makeStyles(theme => ({
 
     form: {
         width: '70%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
     },
 
     textField: {
@@ -59,6 +65,11 @@ const useStyles = makeStyles(theme => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    buttonContainer: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
 }));
 
 function AddPlayer(){
@@ -70,13 +81,13 @@ function AddPlayer(){
     const [firstName, setFirstName] = React.useState('');
     const [secondName, setSecondName] = React.useState('');
     const [DOB, setDOB] = React.useState('01/02/2018');
-    const [positions, setPositions] = React.useState([
-
-    ]);
+    const [positions, setPositions] = React.useState([]);
 
     const handlePosition = e => {
         const attemptValue =  e.target.value;
         const currentPositions = [...positions];
+
+        // Check if position already set
         if(!currentPositions.includes(attemptValue)){
             const newPositions = [...positions, attemptValue];
             setPositions(newPositions);
@@ -89,10 +100,17 @@ function AddPlayer(){
         setPositions(newPositions);
     }
 
+    const handleClear = () => {
+        setFirstName('');
+        setSecondName('');
+        setDOB('01/02/2018')
+        setPositions([])
+    }
+
+    // Handle open and closing of Modal
     const handleOpen = () => {
         setOpen(true);
     };
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -155,11 +173,20 @@ function AddPlayer(){
                                     id="demo-simple-select-outlined"
                                     onChange={handlePosition}
                                 >
+                                    {/* Get all positions from constants file */}
                                     {POSITION.POSITION.map((position, index) => (
                                         <MenuItem key={index} value={position}>{position}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
+                            <div className={classes.buttonContainer}>
+                                <Button variant="contained" size="large" color="primary" styles={classes.Button}>
+                                    Ajouter joueur
+                                </Button>
+                                <Button variant="contained" size="large" color="secondary" styles={classes.Button} onClick={handleClear}>
+                                    Effacer
+                                </Button>
+                            </div>
                         </form>
                     </div>
                 </Fade>
