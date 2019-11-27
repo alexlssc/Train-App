@@ -10,6 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import DeleteIcon from '@material-ui/icons/Delete';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -74,7 +75,17 @@ function AddPlayer(){
     ]);
 
     const handlePosition = e => {
-        const newPositions = [...positions, {position: e.target.value}];
+        const attemptValue =  e.target.value;
+        const currentPositions = [...positions];
+        if(!currentPositions.includes(attemptValue)){
+            const newPositions = [...positions, attemptValue];
+            setPositions(newPositions);
+        }
+    }
+
+    const deletePosition = e => {
+        const newPositions = [...positions];
+        newPositions.splice(e.target.index, 1);
         setPositions(newPositions);
     }
 
@@ -129,7 +140,10 @@ function AddPlayer(){
                             <h2>Ses postes</h2>
                             <List>
                                 {positions.map((position, index) => (
-                                    <ListItem key={index} value={position.position}>{position.position}</ListItem>
+                                    <ListItem key={index} value={position}>
+                                        {position}
+                                        <ListItemIcon key={index} onClick={deletePosition} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
+                                    </ListItem>
                                 ))}
                             </List>
                             <FormControl variant="outlined" className={classes.formControl}>
