@@ -82,10 +82,10 @@ const AddPlayer = () => {
 
 
     const [firstName, setFirstName] = React.useState('');
-    const [secondName, setSecondName] = React.useState('');
+    const [lastName, setLastName] = React.useState('');
     const [DOB, setDOB] = React.useState('01/02/2018');
     const [positions, setPositions] = React.useState([]);
-    const dbRef = firebase.database().ref()
+    const db = firebase.database()
 
     const handlePosition = e => {
         const attemptValue =  e.target.value;
@@ -106,7 +106,7 @@ const AddPlayer = () => {
 
     const handleClear = () => {
         setFirstName('');
-        setSecondName('');
+        setLastName('');
         setDOB('01/02/2018')
         setPositions([])
     }
@@ -121,7 +121,20 @@ const AddPlayer = () => {
 
     async function pushNewPlayer(e){
         e.preventDefault();
-        dbRef.push('test123');
+        db.ref('players').push({
+                firstName: firstName,
+                lastName: lastName,
+                dob: DOB,
+                positions: positions
+            }
+            ,
+            function(error) {
+            if (error)
+                console.log('Error has occured during saving process')
+            else
+                handleClear()
+                handleClose()
+        })
     }
 
     return (
@@ -146,7 +159,7 @@ const AddPlayer = () => {
                         <h2 id="transition-modal-title">Ajouter un joueur</h2>
                         <form className={classes.form} noValidate autoComplete="off">
                             <TextField className={classes.textField} id="playerFirstName" name="firstname" label= "Prénom" floatingLabelText="Prénom" variant="outlined" value={firstName} onChange={e => setFirstName(e.target.value)}/>
-                            <TextField className={classes.textField} id="playerSecondName" name="secondName" label= "Nom de famille" floatingLabelText="Nom de famille" variant="outlined" value={secondName} onChange={e => setSecondName(e.target.value)}/>
+                            <TextField className={classes.textField} id="playerSecondName" name="secondName" label= "Nom de famille" floatingLabelText="Nom de famille" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)}/>
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                 <KeyboardDatePicker
                                     disableToolbar
