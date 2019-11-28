@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,11 +17,14 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import DateFnsUtils from '@date-io/date-fns';
-import * as POSITION from '../../constants/positions'
+import * as POSITION from '../../constants/positions';
+import firebase from "firebase";
+
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import FirebaseContext from "../Firebase/context";
 
 
 const useStyles = makeStyles(theme => ({
@@ -72,7 +75,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function AddPlayer(){
+const AddPlayer = () => {
 
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
@@ -82,6 +85,7 @@ function AddPlayer(){
     const [secondName, setSecondName] = React.useState('');
     const [DOB, setDOB] = React.useState('01/02/2018');
     const [positions, setPositions] = React.useState([]);
+    const dbRef = firebase.database().ref()
 
     const handlePosition = e => {
         const attemptValue =  e.target.value;
@@ -115,6 +119,10 @@ function AddPlayer(){
         setOpen(false);
     };
 
+    async function pushNewPlayer(e){
+        e.preventDefault();
+        dbRef.push('test123');
+    }
 
     return (
         <div>
@@ -180,7 +188,7 @@ function AddPlayer(){
                                 </Select>
                             </FormControl>
                             <div className={classes.buttonContainer}>
-                                <Button variant="contained" size="large" color="primary" styles={classes.Button}>
+                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={pushNewPlayer}>
                                     Ajouter joueur
                                 </Button>
                                 <Button variant="contained" size="large" color="secondary" styles={classes.Button} onClick={handleClear}>
