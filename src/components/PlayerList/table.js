@@ -27,7 +27,6 @@ const PlayerTable = () => {
 
     const fetchPlayers = async () => {
         const snap = await dbRef.once('value')
-        const newValue = {uid: snap.key, values: snap.val()};
         setListPlayers({...listPlayers, player: snap.val()})
     }
 
@@ -52,7 +51,11 @@ const PlayerTable = () => {
                             <TableCell >{playerObject["lastName"]}</TableCell>
                             <TableCell align="right">{playerObject["firstName"]}</TableCell>
                             <TableCell align="right">{playerObject["dob"]}</TableCell>
-                            <TableCell align="right">{playerObject["positions"]}</TableCell>
+                            <TableCell align="right" style={{whiteSpace:'pre'}}>
+                                {playerObject["positions"].map((position) => (
+                                    position + '\n'
+                                ))}
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
