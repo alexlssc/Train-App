@@ -7,6 +7,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import firebase from "firebase";
+import Button from "@material-ui/core/Button";
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles({
     root: {
@@ -15,6 +18,11 @@ const useStyles = makeStyles({
     },
     table: {
         minWidth: 650,
+    },
+    buttonContainer: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
     },
 });
 
@@ -39,15 +47,15 @@ const PlayerTable = () => {
 
     React.useEffect(() => {
         playerHandler()
+        // eslint-disable-next-line
     }, []);
 
 
-    function _calculateAge(birthday) { // birthday is a date
+    function _calculateAge(birthday) {
         const dateParts = birthday.split("/");
         const birthdayObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
         const ageDifMs = Date.now() - birthdayObject.getTime();
-        const ageDate = new Date(ageDifMs); // miliseconds from epoch
-        console.log(ageDifMs)
+        const ageDate = new Date(ageDifMs);
         return Math.abs(ageDate.getUTCFullYear() - 1970).toString();
     }
 
@@ -72,6 +80,28 @@ const PlayerTable = () => {
                                 {playerObject["positions"].map((position) => (
                                     position + '\n'
                                 ))}
+                            </TableCell>
+                            <TableCell style={{width: '25%'}}>
+                                <div className={classes.buttonContainer}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        className={classes.button}
+                                        startIcon={<EditIcon />}
+                                        size="small"
+                                    >
+                                        Editer
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        className={classes.button}
+                                        startIcon={<DeleteIcon />}
+                                        size="small"
+                                    >
+                                        Effacer
+                                    </Button>
+                                </div>
                             </TableCell>
                         </TableRow>
                     ))}
