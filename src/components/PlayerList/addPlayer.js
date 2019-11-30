@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,7 +24,6 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
-import FirebaseContext from "../Firebase/context";
 
 
 const useStyles = makeStyles(theme => ({

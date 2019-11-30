@@ -6,6 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import firebase from "firebase";
 
 const useStyles = makeStyles({
     root: {
@@ -17,47 +18,49 @@ const useStyles = makeStyles({
     },
 });
 
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
-export default function PlayerTable() {
+const PlayerTable = () => {
     const classes = useStyles();
+    const initial_state = {player: ''};
+
+    const [listPlayers, setListPlayers] = React.useState(initial_state);
+    const dbRef = firebase.database().ref('players');
+
+    const fetchPlayers = async () => {
+        const snap = await dbRef.once('value')
+        const newValue = {uid: snap.key, values: snap.val()};
+        setListPlayers({...listPlayers, player: snap.val()})
+    }
+
+    React.useEffect(() => {
+        fetchPlayers()
+    }, []);
 
     return (
         <Paper className={classes.root}>
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Dessert (100g serving)</TableCell>
-                        <TableCell align="right">Calories</TableCell>
-                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                        <TableCell >Nom</TableCell>
+                        <TableCell align="right">Prénom</TableCell>
+                        <TableCell align="right">Age</TableCell>
+                        <TableCell align="right">Positions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map(row => (
-                        <TableRow key={row.name}>
-                            <TableCell component="th" scope="row">
-                                {row.name}
-                            </TableCell>
-                            <TableCell align="right">{row.calories}</TableCell>
-                            <TableCell align="right">{row.fat}</TableCell>
-                            <TableCell align="right">{row.carbs}</TableCell>
-                            <TableCell align="right">{row.protein}</TableCell>
+                    {Object.entries(listPlayers.player).map(([key, playerObject]) => (
+                        <TableRow key={key}>
+                            <TableCell >{playerObject["lastName"]}</TableCell>
+                            <TableCell align="right">{playerObject["firstName"]}</TableCell>
+                            <TableCell align="right">{playerObject["dob"]}</TableCell>
+                            <TableCell align="right">{playerObject["positions"]}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
         </Paper>
     );
-}
+};
+
+
+
+export default PlayerTable;
