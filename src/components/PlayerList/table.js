@@ -33,6 +33,12 @@ const PlayerTable = () => {
     const [listPlayers, setListPlayers] = React.useState(initial_state);
     const dbRef = firebase.database().ref('players');
 
+    const handleRemovePlayer = key => {
+        return function () {
+            dbRef.child(key).remove();
+        }
+    };
+
 
     const playerHandler = () => {
         const handleNewMessages = snap => {
@@ -98,6 +104,7 @@ const PlayerTable = () => {
                                         className={classes.button}
                                         startIcon={<DeleteIcon />}
                                         size="small"
+                                        onClick={handleRemovePlayer(key)}
                                     >
                                         Effacer
                                     </Button>
