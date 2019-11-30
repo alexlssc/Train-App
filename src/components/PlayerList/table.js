@@ -25,14 +25,31 @@ const PlayerTable = () => {
     const [listPlayers, setListPlayers] = React.useState(initial_state);
     const dbRef = firebase.database().ref('players');
 
-    const fetchPlayers = async () => {
-        const snap = await dbRef.once('value')
-        setListPlayers({...listPlayers, player: snap.val()})
-    }
+
+    const playerHandler = () => {
+        const handleNewMessages = snap => {
+            if (snap.val()) setListPlayers({player: snap.val()});
+        }
+        dbRef.on('value', handleNewMessages);
+        return () => {
+            dbRef.off('value', handleNewMessages);
+        };
+    };
+
 
     React.useEffect(() => {
-        fetchPlayers()
+        playerHandler()
     }, []);
+
+
+    function _calculateAge(birthday) { // birthday is a date
+        const dateParts = birthday.split("/");
+        const birthdayObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        const ageDifMs = Date.now() - birthdayObject.getTime();
+        const ageDate = new Date(ageDifMs); // miliseconds from epoch
+        console.log(ageDifMs)
+        return Math.abs(ageDate.getUTCFullYear() - 1970).toString();
+    }
 
     return (
         <Paper className={classes.root}>
@@ -50,7 +67,7 @@ const PlayerTable = () => {
                         <TableRow key={key}>
                             <TableCell >{playerObject["lastName"]}</TableCell>
                             <TableCell align="right">{playerObject["firstName"]}</TableCell>
-                            <TableCell align="right">{playerObject["dob"]}</TableCell>
+                            <TableCell align="right">{_calculateAge(playerObject["dob"])}</TableCell>
                             <TableCell align="right" style={{whiteSpace:'pre'}}>
                                 {playerObject["positions"].map((position) => (
                                     position + '\n'
