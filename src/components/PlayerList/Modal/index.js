@@ -1,30 +1,22 @@
-import React from "react";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from '@material-ui/icons/Add';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import './style.css'
-import TextField from '@material-ui/core/TextField';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
-import DateFnsUtils from '@date-io/date-fns';
-import * as POSITION from '../../constants/positions';
+import TextField from "@material-ui/core/TextField";
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import DeleteIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import * as POSITION from "../../../constants/positions";
+import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@material-ui/core/Button";
 import firebase from "firebase";
-
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-
 
 const useStyles = makeStyles(theme => ({
 
@@ -68,17 +60,14 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(2),
     },
     buttonContainer: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: '100%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
     },
 }));
 
-const AddPlayer = () => {
-
+const TransitionsModal = props => {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
-
 
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
@@ -110,14 +99,6 @@ const AddPlayer = () => {
         setPositions([]);
     };
 
-    // Handle open and closing of Modal
-    const handleOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
-
     async function pushNewPlayer(e){
         e.preventDefault();
         db.ref('players').push({
@@ -128,32 +109,29 @@ const AddPlayer = () => {
             }
             ,
             function(error) {
-            if (error)
-                console.log('Error has occured during saving process');
-            else
-                handleClear();
-                handleClose();
-        })
+                if (error)
+                    console.log('Error has occured during saving process');
+                else
+                    handleClear();
+                    props.handleClose();
+            })
     }
 
     return (
         <div>
-            <Fab id="addPlayerButton" color="primary" onClick={handleOpen} aria-label="add">
-                <AddIcon />
-            </Fab>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 className={classes.modal}
-                open={open}
-                onClose={handleClose}
+                open={props.open}
+                onClose={() => props.handleClose()}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
                     timeout: 500,
                 }}
             >
-                <Fade in={open}>
+                <Fade in={props.open}>
                     <div className={classes.paper}>
                         <h2 id="transition-modal-title">Ajouter un joueur</h2>
                         <form className={classes.form} noValidate autoComplete="off">
@@ -180,7 +158,7 @@ const AddPlayer = () => {
                                 {positions.map((position, index) => (
                                     <ListItem key={index} value={position}>
                                         {position}
-                                        <ListItemIcon key={index} onClick={deletePosition} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
+                                        <ListItemIcon key={index} onClick={() => deletePosition()} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
                                     </ListItem>
                                 ))}
                             </List>
@@ -191,7 +169,7 @@ const AddPlayer = () => {
                                 <Select
                                     labelId="demo-simple-select-outlined-label"
                                     id="demo-simple-select-outlined"
-                                    onChange={handlePosition}
+                                    onChange={() => handlePosition()}
                                 >
                                     {/* Get all positions from constants file */}
                                     {POSITION.POSITION.map((position, index) => (
@@ -215,4 +193,4 @@ const AddPlayer = () => {
     );
 };
 
-export default AddPlayer;
+export default TransitionsModal;
