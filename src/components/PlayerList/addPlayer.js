@@ -79,7 +79,6 @@ const AddPlayer = () => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
 
-
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [DOB, setDOB] = React.useState('01/02/2018');
@@ -123,7 +122,7 @@ const AddPlayer = () => {
         db.ref('players').push({
                 firstName: firstName,
                 lastName: lastName,
-                dob: DOB,
+                dob: DOB.toLocaleString().slice(0,10),
                 positions: positions
             }
             ,
@@ -169,7 +168,7 @@ const AddPlayer = () => {
                                     label="Date picker inline"
                                     value={DOB}
                                     disableFuture='true'
-                                    onChange={(_, newValue) => setDOB(newValue)}
+                                    onChange={date => setDOB(date)}
                                     KeyboardButtonProps={{
                                         'aria-label': 'change date',
                                     }}

@@ -30,16 +30,23 @@ const useStyles = makeStyles({
 const PlayerTable = () => {
     const classes = useStyles();
     const initial_state = {player: ''};
-
     const [listPlayers, setListPlayers] = React.useState(initial_state);
+    const [playerEdit, setPlayerEdit] = React.useState({player: ''});
+    const [keyPlayerEdit, setKeyPlayerEdit] = React.useState('')
+
 
     // handle opening and closing of modal window
     const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
+
+    const handleOpen = (playerObject, key) => {
+        setPlayerEdit(playerObject);
+        setKeyPlayerEdit(key);
         setOpen(true);
     };
     const handleClose = () => {
         setOpen(false);
+        setPlayerEdit('');
+        setKeyPlayerEdit('');
     };
 
     const dbRef = firebase.database().ref('players');
@@ -107,7 +114,7 @@ const PlayerTable = () => {
                                             className={classes.button}
                                             startIcon={<EditIcon />}
                                             size="small"
-                                            onClick={() => handleOpen()}
+                                            onClick={() => handleOpen(playerObject , key)}
                                         >
                                             Editer
                                         </Button>
@@ -128,7 +135,7 @@ const PlayerTable = () => {
                     </TableBody>
                 </Table>
             </Paper>
-            <Modal open={open} handleOpen={() => handleOpen()} handleClose={() => handleClose()}/>
+            <Modal open={open} handleOpen={() => handleOpen()} handleClose={() => handleClose()} playerEdit={playerEdit} playerKey={keyPlayerEdit}/>
         </div>
     );
 };

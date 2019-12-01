@@ -4,7 +4,6 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Skeleton from "../DisplaySkeleton";
 import MainContentDashboard from "./content";
 
-
 const MainPage = () => (
     <div>
         <MuiThemeProvider>

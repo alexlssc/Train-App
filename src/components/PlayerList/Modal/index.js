@@ -9,7 +9,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import DeleteIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import DeleteIcon from '@material-ui/icons/Delete';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -71,9 +71,11 @@ const TransitionsModal = props => {
 
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
-    const [DOB, setDOB] = React.useState('01/02/2018');
+    const [DOB, setDOB] = React.useState(new Date());
     const [positions, setPositions] = React.useState([]);
+
     const db = firebase.database();
+
 
     const handlePosition = e => {
         const attemptValue =  e.target.value;
@@ -86,6 +88,22 @@ const TransitionsModal = props => {
         }
     };
 
+    function rightFormatDate(oldDate){
+        if(oldDate){
+            const dateParts = oldDate.split('/');
+            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        }
+    }
+
+    React.useEffect(() => {
+        if(props.playerEdit){
+            setFirstName(props.playerEdit['firstName']);
+            setLastName(props.playerEdit['lastName']);
+            setDOB(rightFormatDate(props.playerEdit['dob']));
+            setPositions([props.playerEdit['positions']]);
+        }
+    }, [props.playerEdit]);
+
     const deletePosition = e => {
         const newPositions = [...positions];
         newPositions.splice(e.target.index, 1);
@@ -95,7 +113,7 @@ const TransitionsModal = props => {
     const handleClear = () => {
         setFirstName('');
         setLastName('');
-        setDOB('01/02/2018');
+        setDOB(new Date());
         setPositions([]);
     };
 
@@ -117,6 +135,26 @@ const TransitionsModal = props => {
             })
     }
 
+    async function updatePlayer(e){
+        e.preventDefault();
+        db.ref('players').child(props.playerKey).update({
+                firstName: firstName,
+                lastName: lastName,
+                dob: DOB.toLocaleString().slice(0,10),
+                positions: positions
+            }
+            ,
+            function(error) {
+                if (error)
+                    console.log('Error has occured during saving process');
+                else
+                    handleClear();
+                props.handleClose();
+            })
+    }
+
+
+
     return (
         <div>
             <Modal
@@ -128,12 +166,12 @@ const TransitionsModal = props => {
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
-                    timeout: 500,
+                    timeout: 300,
                 }}
             >
                 <Fade in={props.open}>
                     <div className={classes.paper}>
-                        <h2 id="transition-modal-title">Ajouter un joueur</h2>
+                        <h2 id="transition-modal-title">{props.playerEdit ? 'Editer le joueur' : 'Ajouter un joueur'}</h2>
                         <form className={classes.form} noValidate autoComplete="off">
                             <TextField className={classes.textField} id="playerFirstName" name="firstname" label= "Prénom" floatingLabelText="Prénom" variant="outlined" value={firstName} onChange={e => setFirstName(e.target.value)}/>
                             <TextField className={classes.textField} id="playerSecondName" name="secondName" label= "Nom de famille" floatingLabelText="Nom de famille" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)}/>
@@ -147,7 +185,7 @@ const TransitionsModal = props => {
                                     label="Date picker inline"
                                     value={DOB}
                                     disableFuture='true'
-                                    onChange={(_, newValue) => setDOB(newValue)}
+                                    onChange={date => setDOB(date)}
                                     KeyboardButtonProps={{
                                         'aria-label': 'change date',
                                     }}
@@ -158,7 +196,7 @@ const TransitionsModal = props => {
                                 {positions.map((position, index) => (
                                     <ListItem key={index} value={position}>
                                         {position}
-                                        <ListItemIcon key={index} onClick={() => deletePosition()} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
+                                        <ListItemIcon key={index} onClick={deletePosition} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
                                     </ListItem>
                                 ))}
                             </List>
@@ -169,7 +207,7 @@ const TransitionsModal = props => {
                                 <Select
                                     labelId="demo-simple-select-outlined-label"
                                     id="demo-simple-select-outlined"
-                                    onChange={() => handlePosition()}
+                                    onChange={handlePosition}
                                 >
                                     {/* Get all positions from constants file */}
                                     {POSITION.POSITION.map((position, index) => (
@@ -178,8 +216,8 @@ const TransitionsModal = props => {
                                 </Select>
                             </FormControl>
                             <div className={classes.buttonContainer}>
-                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={pushNewPlayer}>
-                                    Ajouter joueur
+                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={updatePlayer}>
+                                    {props.playerEdit ? 'Editer joueur' : 'Ajouter joueur'}
                                 </Button>
                                 <Button variant="contained" size="large" color="secondary" styles={classes.Button} onClick={handleClear}>
                                     Effacer
