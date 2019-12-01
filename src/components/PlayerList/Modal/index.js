@@ -76,7 +76,6 @@ const TransitionsModal = props => {
 
     const db = firebase.database();
 
-
     const handlePosition = e => {
         const attemptValue =  e.target.value;
         const currentPositions = [...positions];
@@ -88,6 +87,7 @@ const TransitionsModal = props => {
         }
     };
 
+    // Format date to dd/MM/yyyy
     function rightFormatDate(oldDate){
         if(oldDate){
             const dateParts = oldDate.split('/');
@@ -95,21 +95,24 @@ const TransitionsModal = props => {
         }
     }
 
+    // Set input with selected edited player if in edit mode
     React.useEffect(() => {
         if(props.playerEdit){
             setFirstName(props.playerEdit['firstName']);
             setLastName(props.playerEdit['lastName']);
             setDOB(rightFormatDate(props.playerEdit['dob']));
-            setPositions([props.playerEdit['positions']]);
+            setPositions([].concat(props.playerEdit['positions']));
         }
     }, [props.playerEdit]);
 
+    // Remove one selected position from list
     const deletePosition = e => {
         const newPositions = [...positions];
         newPositions.splice(e.target.index, 1);
         setPositions(newPositions);
     };
 
+    // Clear all input
     const handleClear = () => {
         setFirstName('');
         setLastName('');
@@ -117,12 +120,13 @@ const TransitionsModal = props => {
         setPositions([]);
     };
 
+    // Add new player to db
     async function pushNewPlayer(e){
         e.preventDefault();
         db.ref('players').push({
                 firstName: firstName,
                 lastName: lastName,
-                dob: DOB,
+                dob: DOB.toLocaleString().slice(0,10),
                 positions: positions
             }
             ,
@@ -135,6 +139,8 @@ const TransitionsModal = props => {
             })
     }
 
+
+    // Update player in db
     async function updatePlayer(e){
         e.preventDefault();
         db.ref('players').child(props.playerKey).update({
@@ -153,6 +159,12 @@ const TransitionsModal = props => {
             })
     }
 
+    // Clear current state of next use and close
+    const handleModalClose = () => {
+        handleClear();
+        props.handleClose();
+    }
+
 
 
     return (
@@ -162,7 +174,7 @@ const TransitionsModal = props => {
                 aria-describedby="transition-modal-description"
                 className={classes.modal}
                 open={props.open}
-                onClose={() => props.handleClose()}
+                onClose={() => handleModalClose()}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
@@ -216,7 +228,7 @@ const TransitionsModal = props => {
                                 </Select>
                             </FormControl>
                             <div className={classes.buttonContainer}>
-                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={updatePlayer}>
+                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={props.playerEdit ? updatePlayer : pushNewPlayer}>
                                     {props.playerEdit ? 'Editer joueur' : 'Ajouter joueur'}
                                 </Button>
                                 <Button variant="contained" size="large" color="secondary" styles={classes.Button} onClick={handleClear}>
