@@ -11,6 +11,8 @@ import Button from "@material-ui/core/Button";
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import Modal from './Modal';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles({
     root: {
@@ -25,14 +27,97 @@ const useStyles = makeStyles({
         justifyContent: 'space-between',
         width: '100%',
     },
+    visuallyHidden: {
+        border: 0,
+        clip: 'rect(0 0 0 0)',
+        height: 1,
+        margin: -1,
+        overflow: 'hidden',
+        padding: 0,
+        position: 'absolute',
+        top: 20,
+        width: 1,
+    },
 });
+
+function desc(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function EnhancedTableHead(props) {
+    const { classes, order, orderBy, onRequestSort } = props;
+
+    const createSortHandler = property => event => {
+        onRequestSort(event, property);
+    };
+
+    return (
+        <TableHead>
+            <TableRow>
+                <TableCell key='lastName' sortDirection={orderBy ===  'lastName' ? order : false}>
+                    <TableSortLabel
+                        active={orderBy === 'lastName'}
+                        direction={order}
+                        onClick={createSortHandler('lastName')}
+                    >
+                        {'Nom'}
+                        {orderBy === 'lastName' ? (
+                            <span className={classes.visuallyHidden}>
+                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                            </span>
+                        ) : null}
+                    </TableSortLabel>
+                </TableCell>
+                <TableCell key='firstName' sortDirection={orderBy ===  'firstName' ? order : false} align={"right"}>
+                    <TableSortLabel
+                        active={orderBy === 'firstName'}
+                        direction={order}
+                        onClick={createSortHandler('firstName')}
+                    >
+                        {'Prénom'}
+                        {orderBy === 'firstName' ? (
+                            <span className={classes.visuallyHidden}>
+                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                            </span>
+                        ) : null}
+                    </TableSortLabel>
+                </TableCell>
+                <TableCell key='dob' align={"right"}>Age</TableCell>
+                <TableCell key='positions' align={"right"}>Positions</TableCell>
+            </TableRow>
+        </TableHead>
+    );
+}
+
+EnhancedTableHead.propTypes = {
+    classes: PropTypes.object.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    orderBy: PropTypes.string.isRequired,
+};
 
 const PlayerTable = () => {
     const classes = useStyles();
+
+    const [order, setOrder] = React.useState('asc');
+    const [orderBy, setOrderBy] = React.useState('lastName');
+
     const initial_state = {player: ''};
     const [listPlayers, setListPlayers] = React.useState(initial_state);
     const [playerEdit, setPlayerEdit] = React.useState({player: ''});
-    const [keyPlayerEdit, setKeyPlayerEdit] = React.useState('')
+    const [keyPlayerEdit, setKeyPlayerEdit] = React.useState('');
+
+    const handleRequestSort = (event, property) => {
+        const isDesc = orderBy === property && order === 'desc';
+        setOrder(isDesc ? 'asc' : 'desc');
+        setOrderBy(property);
+    };
 
 
     // handle opening and closing of modal window
@@ -49,7 +134,7 @@ const PlayerTable = () => {
         setKeyPlayerEdit('');
     };
 
-    const dbRef = firebase.database().ref('players');
+    const dbRef = firebase.database().ref('players/');
 
     const handleRemovePlayer = key => {
         return function () {
@@ -61,16 +146,37 @@ const PlayerTable = () => {
     const playerHandler = () => {
         const handleNewMessages = snap => {
             if (snap.val()) setListPlayers({player: snap.val()});
-        }
+        };
         dbRef.on('value', handleNewMessages);
         return () => {
             dbRef.off('value', handleNewMessages);
         };
     };
 
+    function swap(a,b){
+        let temp = listPlayers[a];
+        listPlayers[a] = listPlayers[b];
+        listPlayers[b] = temp;
+    }
+
+    function isBigger(a,b, category){
+        return a[category > b[category]];
+    }
+
+    function bubbleSort(list, category){
+        for (let i = 0; i < list.length; i++){
+            for (let j = 0; i < list.length - i - 1; j++){
+                if(isBigger(list[j], list[j+1], category)){
+                    swap(j, j+1)
+                }
+            }
+        }
+    }
+
 
     React.useEffect(() => {
-        playerHandler()
+        playerHandler();
+        bubbleSort(listPlayers, 'lastName');
         // eslint-disable-next-line
     }, []);
 
@@ -87,16 +193,11 @@ const PlayerTable = () => {
         <div>
             <Paper className={classes.root}>
                 <Table className={classes.table} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell >Nom</TableCell>
-                            <TableCell align="right">Prénom</TableCell>
-                            <TableCell align="right">Age</TableCell>
-                            <TableCell align="right">Positions</TableCell>
-                        </TableRow>
-                    </TableHead>
+                    <EnhancedTableHead classes={classes} onRequestSort={handleRequestSort}  order={order} orderBy={orderBy}/>
                     <TableBody>
-                        {Object.entries(listPlayers.player).map(([key, playerObject]) => (
+                        {Object.entries(listPlayers.player).sort(
+                            (a,b) => a[1]['lastName'].localeCompare(b[1]['lastName'])
+                        ).map(([key, playerObject]) => (
                             <TableRow key={key}>
                                 <TableCell >{playerObject["lastName"]}</TableCell>
                                 <TableCell align="right">{playerObject["firstName"]}</TableCell>
