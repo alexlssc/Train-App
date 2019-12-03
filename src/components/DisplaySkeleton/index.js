@@ -10,6 +10,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -77,7 +78,7 @@ function ResponsiveDrawer(props) {
                     <ListItemText primary="Liste Joueur"/>
                 </ListItem>
                 <ListItem button component={Link} to={ROUTES.TRAININGS} key="listPlayer">
-                    <ListItemIcon><PeopleIcon/></ListItemIcon>
+                    <ListItemIcon><AssignmentIcon/></ListItemIcon>
                     <ListItemText primary="Entrainements"/>
                 </ListItem>
             </List>

@@ -6,6 +6,8 @@ import * as ROUTES from './constants/routes';
 import SignInPage from './components/SignIn'
 import MainPage from "./components/Main";
 import PlayerList from './components/PlayerList';
+import TrainPage from './components/Training/AllTrainings';
+import TrainingsInputContent from "./components/Training/TrainingsInput/";
 import { withAuthentication } from './components/Session';
 
 const App = () => (
@@ -14,6 +16,8 @@ const App = () => (
             <Route path={ROUTES.LANDING} exact component={MainPage} />
             <Route path={ROUTES.SIGN_IN} exact component={SignInPage}/>
             <Route path={ROUTES.PLAYER_LIST} exact component={PlayerList}/>
+            <Route path={ROUTES.TRAININGS} exact component={TrainPage}/>
+            <Route path={ROUTES.INPUTTRAININGS} exact component={TrainingsInputContent}/>
         </Switch>
     </Router>
 );

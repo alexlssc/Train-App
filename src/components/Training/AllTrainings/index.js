@@ -1,14 +1,14 @@
 import React from 'react'
-import { withAuthorization } from '../Session'
+import { withAuthorization } from '../../Session'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Skeleton from "../DisplaySkeleton";
-import MainContent from "./content";
+import Skeleton from "../../DisplaySkeleton";
+import TrainingContent from "./content";
 
 
 const MainPage = () => (
     <div>
         <MuiThemeProvider>
-            <Skeleton content={<MainContent/>}/>
+            <Skeleton content={<TrainingContent/>}/>
         </MuiThemeProvider>
     </div>
 );
