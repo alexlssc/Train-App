@@ -106,10 +106,12 @@ const TransitionsModal = props => {
     }, [props.playerEdit]);
 
     // Remove one selected position from list
-    const deletePosition = e => {
-        const newPositions = [...positions];
-        newPositions.splice(e.target.index, 1);
-        setPositions(newPositions);
+    const deletePosition = index => {
+        if (index){
+            const newPositions = [...positions];
+            newPositions.splice(index, 1);
+            setPositions(newPositions);
+        }
     };
 
     // Clear all input
@@ -208,7 +210,7 @@ const TransitionsModal = props => {
                                 {positions.map((position, index) => (
                                     <ListItem key={index} value={position}>
                                         {position}
-                                        <ListItemIcon key={index} onClick={deletePosition} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
+                                        <ListItemIcon key={index} onClick={() => deletePosition(index)} style={{cursor: 'pointer'}}><DeleteIcon /></ListItemIcon>
                                     </ListItem>
                                 ))}
                             </List>
