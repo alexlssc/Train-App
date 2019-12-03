@@ -40,16 +40,6 @@ const useStyles = makeStyles({
     },
 });
 
-function desc(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
 function EnhancedTableHead(props) {
     const { classes, order, orderBy, onRequestSort } = props;
 
@@ -153,30 +143,8 @@ const PlayerTable = () => {
         };
     };
 
-    function swap(a,b){
-        let temp = listPlayers[a];
-        listPlayers[a] = listPlayers[b];
-        listPlayers[b] = temp;
-    }
-
-    function isBigger(a,b, category){
-        return a[category > b[category]];
-    }
-
-    function bubbleSort(list, category){
-        for (let i = 0; i < list.length; i++){
-            for (let j = 0; i < list.length - i - 1; j++){
-                if(isBigger(list[j], list[j+1], category)){
-                    swap(j, j+1)
-                }
-            }
-        }
-    }
-
-
     React.useEffect(() => {
         playerHandler();
-        bubbleSort(listPlayers, 'lastName');
         // eslint-disable-next-line
     }, []);
 
