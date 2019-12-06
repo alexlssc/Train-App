@@ -107,11 +107,9 @@ const TransitionsModal = props => {
 
     // Remove one selected position from list
     const deletePosition = index => {
-        if (index){
-            const newPositions = [...positions];
-            newPositions.splice(index, 1);
-            setPositions(newPositions);
-        }
+        const newPositions = [...positions];
+        newPositions.splice(index, 1);
+        setPositions(newPositions);
     };
 
     // Clear all input
