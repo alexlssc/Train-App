@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import WeekTrainingTable from "./WeekTrainingTable";
 import {Button, makeStyles} from "@material-ui/core";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -18,12 +18,38 @@ const useStyles = makeStyles({
 
 const TrainingContent = () => {
     const classes = useStyles();
+
+    const [trainings, setTrainings] = useState({trainings: ''})
+
     const dbRef = firebase.database().ref('trainings');
     let history = useHistory();
 
+    const getTodayDate = () => {
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        let yyyy = today.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    };
+
+    const trainingsHandler = () => {
+        const handleNewTrainings = snap => {
+            if (snap.val()) setTrainings({trainings: snap.val()});
+        };
+        dbRef.on('value', handleNewTrainings);
+        return () => {
+            dbRef.off('value', handleNewTrainings);
+        };
+    };
+
+    React.useEffect(() => {
+        trainingsHandler();
+        // eslint-disable-next-line
+    }, []);
+
     const handleNewTraining = () => {
         dbRef.push({
-            date: '22/05/2020',
+            date: getTodayDate(),
             overallPerformance: 0,
             playerAttendees: '',
         }).then((snap) => {
@@ -36,7 +62,7 @@ const TrainingContent = () => {
         <div>
             <h1>Entraînement</h1>
             <h2>Entraînement cette semaine</h2>
-            <WeekTrainingTable/>
+            <WeekTrainingTable trainings={trainings.trainings}/>
             <Button
                 variant="contained"
                 color="primary"

@@ -17,7 +17,7 @@ const useStyles = makeStyles({
     },
 });
 
-const WeekTrainingTable = () => {
+const WeekTrainingTable = props => {
     const classes = useStyles();
     return (
         <Paper className={classes.root}>
@@ -29,7 +29,12 @@ const WeekTrainingTable = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-
+                    {Object.entries(props.trainings).map(([key, trainingObject]) => (
+                        <TableRow key={key}>
+                            <TableCell>{trainingObject['date']}</TableCell>
+                            <TableCell align={"right"}>{trainingObject['overallPerformance']}</TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </Paper>

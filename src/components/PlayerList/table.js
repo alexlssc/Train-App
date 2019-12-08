@@ -134,12 +134,12 @@ const PlayerTable = () => {
 
 
     const playerHandler = () => {
-        const handleNewMessages = snap => {
+        const handleNewPlayers = snap => {
             if (snap.val()) setListPlayers({player: snap.val()});
         };
-        dbRef.on('value', handleNewMessages);
+        dbRef.on('value', handleNewPlayers);
         return () => {
-            dbRef.off('value', handleNewMessages);
+            dbRef.off('value', handleNewPlayers);
         };
     };
 
