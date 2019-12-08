@@ -17,7 +17,7 @@ const App = () => (
             <Route path={ROUTES.SIGN_IN} exact component={SignInPage}/>
             <Route path={ROUTES.PLAYER_LIST} exact component={PlayerList}/>
             <Route path={ROUTES.TRAININGS} exact component={TrainPage}/>
-            <Route path={ROUTES.INPUTTRAININGS} exact component={TrainingsInputContent}/>
+            <Route path={ROUTES.INPUTTRAININGS} component={TrainingsInputContent}/>
         </Switch>
     </Router>
 );
