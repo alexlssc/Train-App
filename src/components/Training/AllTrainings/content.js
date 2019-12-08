@@ -60,9 +60,16 @@ const TrainingContent = () => {
     };
 
     const handleEditTrainings = key => {
-        if(key){
-            history.push('/trainings/' + key)
-        }
+        return (
+            <Link
+                to={{
+                    pathname: "/trainings/" + key,
+                    search: "?sort=name",
+                    hash: "#the-hash",
+                    state: { fromDashboard: true }
+                }}
+            />
+        )
     };
 
     const handleDeleteTrainings = key => {

@@ -12,9 +12,42 @@ import {makeStyles} from "@material-ui/styles";
 import * as RATINGS from '../../../../constants/ratings';
 
 const useStyle = () => (makeStyles({
-}))
+}));
+
+
+
 
 const TableTraining = props => {
+
+    function displayAttendeesRows(){
+        if(typeof props.playerAttendees != "undefined"){
+            const output = Object.entries(props.playerAttendees).map(([key, playerObject]) => (
+                <TableRow key={key}>
+                    <TableCell>{playerObject["lastName"] + ' ' + playerObject["firstName"]}</TableCell>
+                    <TableCell align={'right'}>
+                        <Select
+                            defaultValue={{value: playerObject['performance'], label: playerObject['performance']}}
+                            value={{value: playerObject['performance'], label: playerObject['performance']}}
+                            label="Single select"
+                            options={
+                                RATINGS.RATINGS.map(rating => (
+                                    {value: rating, label: rating}
+                                ))
+                            }
+                            onChange={value => props.updatePlayerAttendee(key, value)}
+                        />
+                    </TableCell>
+                    <TableCell align={'right'} style={{width: 50}}>
+                        <IconButton aria-label="delete" >
+                            <DeleteIcon />
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
+            ))
+            return output;
+        }
+    }
+
     return (
         <Paper>
             <Table>
@@ -23,28 +56,8 @@ const TableTraining = props => {
                     <TableCell align={'right'}>Performance</TableCell>
                 </TableHead>
                 <TableBody>
-                    {Object.entries(props.playerAttendees.players).map(([key, playerObject]) => (
-                        <TableRow key={key}>
-                            <TableCell>{playerObject["attendeeName"]}</TableCell>
-                            <TableCell align={'right'}>
-                                <Select
-                                    defaultValue={''}
-                                    label="Single select"
-                                    options={
-                                        RATINGS.RATINGS.map(rating => (
-                                            {value: rating, label: rating}
-                                        ))
-                                    }
-                                    onChange={value => props.updatePlayerAttendee(key, value)}
-                                />
-                            </TableCell>
-                            <TableCell align={'right'} style={{width: 50}}>
-                                <IconButton aria-label="delete" >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {displayAttendeesRows()}
+                    {console.log(props.playerAttendees)}
                 </TableBody>
             </Table>
         </Paper>

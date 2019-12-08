@@ -7,6 +7,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import {Paper} from "material-ui";
 import TableTraining from "./TableTraining";
+import { useParams } from "react-router-dom";
 
 const useStyles = makeStyles({
     root: {
@@ -21,39 +22,59 @@ const useStyles = makeStyles({
     }
 });
 
-const TrainingsInputContent = () => {
+
+const TrainingsInputContent = props => {
+    const { id } = useParams();
+
     const [listPlayers, setListPlayers] = useState({player: ''});
     const [playerAttendees, setPlayerAttendees] = useState({players: ''});
+    const [trainingData, setTrainingData] = useState({training: ''});
 
-    const dbRef = firebase.database().ref('/players');
+    const dbRefPlayers = firebase.database().ref('/players');
+    const dbRefTraining = firebase.database().ref('trainings').child(id);
     const classes = useStyles();
+
+
 
     const listPlayersHandler = () => {
         const handlePlayers = snap => {
             if (snap.val()) setListPlayers({player: snap.val()});
         };
-        dbRef.once('value', handlePlayers)
+        dbRefPlayers.once('value', handlePlayers)
     };
+
+    const trainingHandler = () => {
+        const handleNewTrainings = snap => {
+            if (snap.val()) setTrainingData({training: snap.val()});
+        };
+        dbRefTraining.on('value', handleNewTrainings);
+        return () => {
+            dbRefTraining.off('value', handleNewTrainings);
+        };
+    };
+
 
     React.useState(() => {
         listPlayersHandler();
+        trainingHandler();
     }, []);
 
+    function checkIfUserExists(key) {
+        dbRefTraining.child('playerAttendees').once('value', function(snapshot) {
+            return snapshot.hasChild(key);
+        });
+    }
+
     const handleAddAttendee = e => {
-        const attempt = e.target.value;
-        const attemptItems = attempt.split('/');
-        if(typeof playerAttendees.players[attemptItems[1]] == 'undefined'){
-            setPlayerAttendees(prevState => ({
-                players: {
-                    ...prevState.players,
-                    [attemptItems[1]]: {
-                        attendeeName: attemptItems[0],
-                        performance: 0
-                    }
-                }
-            }))
-        } else {
-            console.log('Already exist')
+        e.preventDefault();
+        const playerKey = e.target.value[1];
+        console.log(checkIfUserExists(playerKey))
+        if(!checkIfUserExists(playerKey)){
+            dbRefTraining.child('playerAttendees').child(playerKey).set({
+                firstName: e.target.value[0].firstName,
+                lastName: e.target.value[0].lastName,
+                performance: 0
+            })
         }
 
     };
@@ -61,15 +82,9 @@ const TrainingsInputContent = () => {
 
     const handleUpdatePlayerAttendee = (key, value) => {
         console.log(key, value);
-        setPlayerAttendees(prevState => ({
-            players: {
-                ...prevState.players,
-                [key]: {
-                    ...prevState.players[key],
-                    performance: value.value
-                }
-            }
-        }))
+        dbRefTraining.child('playerAttendees').child(key).update({
+            performance: value.value
+        })
     };
 
     return (
@@ -88,13 +103,13 @@ const TrainingsInputContent = () => {
                     >
                         {/* Get all positions from constants file */}
                         {Object.entries(listPlayers.player).map(([key, playerObject]) => (
-                            <MenuItem value={playerObject['lastName'] + ' ' + playerObject['firstName']+'/'+key}>{playerObject['lastName'] + ' ' + playerObject['firstName']}</MenuItem>
+                            <MenuItem key={key} value={[playerObject, key]}>{playerObject['lastName'] + ' ' + playerObject['firstName']}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
             </Paper>
             <br/>
-            <TableTraining playerAttendees={playerAttendees} updatePlayerAttendee={handleUpdatePlayerAttendee}/>
+            <TableTraining playerAttendees={typeof trainingData.training.playerAttendees != "undefined" ? trainingData.training.playerAttendees : 'Waiting'} updatePlayerAttendee={handleUpdatePlayerAttendee}/>
         </div>
     )
 };

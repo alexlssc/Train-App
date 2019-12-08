@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete'
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles({
     root: {
@@ -37,9 +38,13 @@ const WeekTrainingTable = props => {
                             <TableCell>{trainingObject['date']}</TableCell>
                             <TableCell align={"right"}>{trainingObject['overallPerformance']}</TableCell>
                             <TableCell align={'right'} style={{width: 50}}>
-                                <IconButton aria-label="edit" onClick={() => props.editHandler(key)}>
-                                    <EditIcon />
-                                </IconButton>
+                                <Link
+                                    to={'trainings/' + key}
+                                >
+                                    <IconButton aria-label="edit">
+                                        <EditIcon />
+                                    </IconButton>
+                                </Link>
                             </TableCell>
                             <TableCell align={'right'} style={{width: 50}}>
                                 <IconButton aria-label="delete" onClick={() => props.deleteHandler(key)} >
