@@ -6,6 +6,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import DeleteIcon from '@material-ui/icons/Delete'
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles({
     root: {
@@ -33,6 +36,16 @@ const WeekTrainingTable = props => {
                         <TableRow key={key}>
                             <TableCell>{trainingObject['date']}</TableCell>
                             <TableCell align={"right"}>{trainingObject['overallPerformance']}</TableCell>
+                            <TableCell align={'right'} style={{width: 50}}>
+                                <IconButton aria-label="edit" onClick={() => props.editHandler(key)}>
+                                    <EditIcon />
+                                </IconButton>
+                            </TableCell>
+                            <TableCell align={'right'} style={{width: 50}}>
+                                <IconButton aria-label="delete" >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

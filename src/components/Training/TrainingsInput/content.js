@@ -58,6 +58,7 @@ const TrainingsInputContent = () => {
 
     };
 
+
     const handleUpdatePlayerAttendee = (key, value) => {
         console.log(key, value);
         setPlayerAttendees(prevState => ({

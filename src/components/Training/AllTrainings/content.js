@@ -42,6 +42,7 @@ const TrainingContent = () => {
         };
     };
 
+
     React.useEffect(() => {
         trainingsHandler();
         // eslint-disable-next-line
@@ -58,11 +59,17 @@ const TrainingContent = () => {
         })
     };
 
+    const handleEditTrainings = key => {
+        if(key){
+            history.push('/trainings/' + key)
+        }
+    }
+
     return (
         <div>
             <h1>Entraînement</h1>
             <h2>Entraînement cette semaine</h2>
-            <WeekTrainingTable trainings={trainings.trainings}/>
+            <WeekTrainingTable trainings={trainings.trainings} editHandler={handleEditTrainings}/>
             <Button
                 variant="contained"
                 color="primary"
