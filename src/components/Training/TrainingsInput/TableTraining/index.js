@@ -9,6 +9,7 @@ import Select from "react-select";
 import DeleteIcon from '@material-ui/icons/Delete'
 import IconButton from '@material-ui/core/IconButton';
 import {makeStyles} from "@material-ui/styles";
+import * as RATINGS from '../../../../constants/ratings';
 
 const useStyle = () => (makeStyles({
 }))
@@ -22,10 +23,21 @@ const TableTraining = props => {
                     <TableCell align={'right'}>Performance</TableCell>
                 </TableHead>
                 <TableBody>
-                    {props.playerAttendees.map(playerAttendee => (
-                        <TableRow key={playerAttendee.attendeeKey}>
-                            <TableCell>{playerAttendee.attendeeName}</TableCell>
-                            <TableCell align={'right'}>{playerAttendee.performance}</TableCell>
+                    {Object.entries(props.playerAttendees.players).map(([key, playerObject]) => (
+                        <TableRow key={key}>
+                            <TableCell>{playerObject["attendeeName"]}</TableCell>
+                            <TableCell align={'right'}>
+                                <Select
+                                    defaultValue={''}
+                                    label="Single select"
+                                    options={
+                                        RATINGS.RATINGS.map(rating => (
+                                            {value: rating, label: rating}
+                                        ))
+                                    }
+                                    onChange={value => props.updatePlayerAttendee(key, value)}
+                                />
+                            </TableCell>
                             <TableCell align={'right'} style={{width: 50}}>
                                 <IconButton aria-label="delete" >
                                     <DeleteIcon />

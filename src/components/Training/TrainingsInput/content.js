@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 
 const TrainingsInputContent = () => {
     const [listPlayers, setListPlayers] = useState({player: ''});
-    const [playerAttendees, setPlayerAttendees] = useState([]);
+    const [playerAttendees, setPlayerAttendees] = useState({players: ''});
 
     const dbRef = firebase.database().ref('/players');
     const classes = useStyles();
@@ -42,13 +42,33 @@ const TrainingsInputContent = () => {
     const handleAddAttendee = e => {
         const attempt = e.target.value;
         const attemptItems = attempt.split('/');
-        let currentAttendees = []
-        playerAttendees.map(playerAttendee => (
-            currentAttendees.push(playerAttendee.attendeeKey)
-        ));
-        if(!currentAttendees.includes(attemptItems[1])){
-            setPlayerAttendees([...playerAttendees, {attendeeKey: attemptItems[1], attendeeName: attemptItems[0], performance: 'UNKNOWN'}])
+        if(typeof playerAttendees.players[attemptItems[1]] == 'undefined'){
+            setPlayerAttendees(prevState => ({
+                players: {
+                    ...prevState.players,
+                    [attemptItems[1]]: {
+                        attendeeName: attemptItems[0],
+                        performance: 0
+                    }
+                }
+            }))
+        } else {
+            console.log('Already exist')
         }
+
+    };
+
+    const handleUpdatePlayerAttendee = (key, value) => {
+        console.log(key, value);
+        setPlayerAttendees(prevState => ({
+            players: {
+                ...prevState.players,
+                [key]: {
+                    ...prevState.players[key],
+                    performance: value.value
+                }
+            }
+        }))
     };
 
     return (
@@ -73,7 +93,7 @@ const TrainingsInputContent = () => {
                 </FormControl>
             </Paper>
             <br/>
-            <TableTraining playerAttendees={playerAttendees}/>
+            <TableTraining playerAttendees={playerAttendees} updatePlayerAttendee={handleUpdatePlayerAttendee}/>
         </div>
     )
 };
