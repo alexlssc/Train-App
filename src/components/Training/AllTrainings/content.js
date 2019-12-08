@@ -63,13 +63,17 @@ const TrainingContent = () => {
         if(key){
             history.push('/trainings/' + key)
         }
+    };
+
+    const handleDeleteTrainings = key => {
+        dbRef.child(key).remove();
     }
 
     return (
         <div>
             <h1>Entraînement</h1>
             <h2>Entraînement cette semaine</h2>
-            <WeekTrainingTable trainings={trainings.trainings} editHandler={handleEditTrainings}/>
+            <WeekTrainingTable trainings={trainings.trainings} editHandler={handleEditTrainings} deleteHandler={handleDeleteTrainings}/>
             <Button
                 variant="contained"
                 color="primary"
