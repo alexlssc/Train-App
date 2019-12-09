@@ -26,12 +26,12 @@ const TableTraining = props => {
                     <TableCell>{playerObject["lastName"] + ' ' + playerObject["firstName"]}</TableCell>
                     <TableCell align={'right'}>
                         <Select
-                            defaultValue={{value: playerObject['performance'], label: playerObject['performance']}}
-                            value={{value: playerObject['performance'], label: playerObject['performance']}}
+                            defaultValue={RATINGS.RATINGS[playerObject['performance'] - 1]}
+                            value={RATINGS.RATINGS[playerObject['performance'] - 1]}
                             label="Single select"
                             options={
                                 RATINGS.RATINGS.map(rating => (
-                                    {value: rating, label: rating}
+                                    rating
                                 ))
                             }
                             onChange={value => props.updatePlayerAttendee(key, value)}
