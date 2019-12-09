@@ -60,15 +60,12 @@ const TrainingsInputContent = props => {
     }, []);
 
     function checkIfUserExists(key) {
-        dbRefTraining.child('playerAttendees').once('value', function(snapshot) {
-            return snapshot.hasChild(key);
-        });
+        return trainingData.training.playerAttendees[key] != null;
     }
 
     const handleAddAttendee = e => {
         e.preventDefault();
         const playerKey = e.target.value[1];
-        console.log(checkIfUserExists(playerKey))
         if(!checkIfUserExists(playerKey)){
             dbRefTraining.child('playerAttendees').child(playerKey).set({
                 firstName: e.target.value[0].firstName,
@@ -81,11 +78,15 @@ const TrainingsInputContent = props => {
 
 
     const handleUpdatePlayerAttendee = (key, value) => {
-        console.log(key, value);
         dbRefTraining.child('playerAttendees').child(key).update({
             performance: value.value
         })
     };
+
+    const handleDeletePlayer = key => {
+        console.log(key)
+        dbRefTraining.child('playerAttendees').child(key).remove();
+    }
 
     return (
         <div>
@@ -109,7 +110,11 @@ const TrainingsInputContent = props => {
                 </FormControl>
             </Paper>
             <br/>
-            <TableTraining playerAttendees={typeof trainingData.training.playerAttendees != "undefined" ? trainingData.training.playerAttendees : 'Waiting'} updatePlayerAttendee={handleUpdatePlayerAttendee}/>
+            <TableTraining
+                playerAttendees={typeof trainingData.training.playerAttendees != "undefined" ? trainingData.training.playerAttendees : 'Waiting'}
+                updatePlayerAttendee={handleUpdatePlayerAttendee}
+                deletePlayerAttendee={handleDeletePlayer}
+            />
         </div>
     )
 };

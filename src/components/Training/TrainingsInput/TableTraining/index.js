@@ -38,7 +38,7 @@ const TableTraining = props => {
                         />
                     </TableCell>
                     <TableCell align={'right'} style={{width: 50}}>
-                        <IconButton aria-label="delete" >
+                        <IconButton aria-label="delete" onClick={() => props.deletePlayerAttendee(key)} >
                             <DeleteIcon />
                         </IconButton>
                     </TableCell>
