@@ -14,13 +14,11 @@ import * as RATINGS from '../../../../constants/ratings';
 const useStyle = () => (makeStyles({
 }));
 
-
-
-
 const TableTraining = props => {
 
     function displayAttendeesRows(){
-        if(typeof props.playerAttendees != "undefined"){
+        if(typeof props.playerAttendees != "undefined" && props.playerAttendees != 'Waiting'){
+            console.log(props)
             const output = Object.entries(props.playerAttendees).map(([key, playerObject]) => (
                 <TableRow key={key}>
                     <TableCell>{playerObject["lastName"] + ' ' + playerObject["firstName"]}</TableCell>

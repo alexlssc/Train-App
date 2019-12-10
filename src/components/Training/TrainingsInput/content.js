@@ -31,6 +31,7 @@ const TrainingsInputContent = props => {
 
     const dbRefPlayers = firebase.database().ref('/players');
     const dbRefTraining = firebase.database().ref('trainings').child(id);
+    const dbRef = firebase.database().ref();
     const classes = useStyles();
 
 
@@ -77,23 +78,30 @@ const TrainingsInputContent = props => {
 
 
     const handleUpdatePlayerAttendee = (key, value) => {
+
+        var updatedPerformanceData = {};
+        updatedPerformanceData['/trainings/' + id + '/playerAttendees/' + key] = {
+            performance: value.value
+        };
         dbRefTraining.child('playerAttendees').child(key).update({
             performance: value.value
-        })
+        });
+
+        dbRefPlayers.child(key).
         updateOverallPerformance()
     };
 
     const updateOverallPerformance = () => {
         const allPerformances = Object.values(trainingData.training.playerAttendees).map(playerAttendee => (
             playerAttendee.performance
-        ))
+        ));
         let sum = allPerformances.reduce((previous, current) => current += previous);
         let avg = sum / allPerformances.length;
 
         dbRefTraining.update({
             overallPerformance: avg
         })
-    }
+    };
 
     const handleDeletePlayer = key => {
         console.log(key)
