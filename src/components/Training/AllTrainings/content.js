@@ -4,7 +4,6 @@ import {Button, makeStyles} from "@material-ui/core";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Link} from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import * as ROUTES from "../../../constants/routes";
 import firebase from "firebase";
 
 
@@ -72,8 +71,14 @@ const TrainingContent = () => {
         )
     };
 
-    const handleDeleteTrainings = key => {
-        dbRef.child(key).remove();
+    const handleDeleteTrainings = async key => {
+        await dbRef.child(key).child('playerAttendees').once('value').then(snap => {
+            snap.forEach(item => {
+                firebase.database().ref('players').child(item.key).child('trainingsAttended').child(key).remove()
+            })
+        });
+
+        await dbRef.child(key).remove();
     }
 
     return (
