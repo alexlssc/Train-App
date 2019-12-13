@@ -11,14 +11,10 @@ import IconButton from '@material-ui/core/IconButton';
 import {makeStyles} from "@material-ui/styles";
 import * as RATINGS from '../../../../constants/ratings';
 
-const useStyle = () => (makeStyles({
-}));
-
 const TableTraining = props => {
 
     function displayAttendeesRows(){
         if(typeof props.playerAttendees != "undefined" && props.playerAttendees != 'Waiting'){
-            console.log(props)
             const output = Object.entries(props.playerAttendees).map(([key, playerObject]) => (
                 <TableRow key={key}>
                     <TableCell>{playerObject["lastName"] + ' ' + playerObject["firstName"]}</TableCell>
@@ -55,7 +51,6 @@ const TableTraining = props => {
                 </TableHead>
                 <TableBody>
                     {displayAttendeesRows()}
-                    {console.log(props.playerAttendees)}
                 </TableBody>
             </Table>
         </Paper>

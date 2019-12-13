@@ -25,13 +25,11 @@ const useStyles = makeStyles({
 
 const TrainingsInputContent = props => {
     const { id } = useParams();
-
     const [listPlayers, setListPlayers] = useState({player: ''});
     const [trainingData, setTrainingData] = useState({training: ''});
 
     const dbRefPlayers = firebase.database().ref('/players');
     const dbRefTraining = firebase.database().ref('trainings').child(id);
-    const dbRef = firebase.database().ref();
     const classes = useStyles();
 
 
@@ -77,36 +75,43 @@ const TrainingsInputContent = props => {
     };
 
 
-    const handleUpdatePlayerAttendee = (key, value) => {
-
-        var updatedPerformanceData = {};
-        updatedPerformanceData['/trainings/' + id + '/playerAttendees/' + key] = {
-            performance: value.value
-        };
-        dbRefTraining.child('playerAttendees').child(key).update({
+    // Update player attendee performance and update new overall performance
+    const handleUpdatePlayerAttendee = async (key, value) => {
+        await dbRefTraining.child('playerAttendees').child(key).update({
             performance: value.value
         });
+        const newOverallPerformance = await updateOverallPerformance().then(result => {
+            return result
+        });
 
-        dbRefPlayers.child(key).
-        updateOverallPerformance()
+        await dbRefTraining.update({
+            overallPerformance: newOverallPerformance
+        });
+
+        dbRefPlayers.child(key).child('trainingsAttended').child(id).update({
+            performance: value.value
+        })
+
     };
 
-    const updateOverallPerformance = () => {
-        const allPerformances = Object.values(trainingData.training.playerAttendees).map(playerAttendee => (
-            playerAttendee.performance
-        ));
+    // Get value from each player training performance and return the average
+    const updateOverallPerformance = async() => {
+        let allPerformances = await dbRefTraining.child('playerAttendees').once('value').then(snap => {
+            return Object.values(snap.val()).map(playerValues => (
+                playerValues['performance']
+            ));
+        });
         let sum = allPerformances.reduce((previous, current) => current += previous);
         let avg = sum / allPerformances.length;
-
-        dbRefTraining.update({
-            overallPerformance: avg
-        })
+        return avg
     };
 
     const handleDeletePlayer = key => {
-        console.log(key)
+        // Remove player from training's data
         dbRefTraining.child('playerAttendees').child(key).remove();
-    }
+        // Remove training from player's data
+        dbRefPlayers.child(key).child('trainingsAttended').child(id).remove();
+    };
 
     return (
         <div>

@@ -7,5 +7,4 @@ export const RATINGS = [
     {value: ORANGE, label: 'ORANGE'},
     {value: YELLOW, label: 'JAUNE'},
     {value: GREEN, label: 'VERT'},
-
 ]
