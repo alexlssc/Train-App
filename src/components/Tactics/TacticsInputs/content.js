@@ -9,6 +9,7 @@ import * as POSITION from '../../../constants/positions'
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
+import CustomisedSnackBar from "../../SnackBarContent";
 
 
 const useStyles = makeStyles({
@@ -32,6 +33,7 @@ const TacticsInputContent = () => {
     const classes = useStyles();
     const { id } = useParams();
     const dbRefTactics = firebase.database().ref('tactics').child(id);
+    const [status, setStatus] = useState('')
     const [tactic, setTactic] = useState({
         tactic: {
             name: ''
@@ -54,20 +56,30 @@ const TacticsInputContent = () => {
         })
     };
 
+    const nbOfPosition = () => {
+        var counter = 0;
+        Object.values(tactic.tactic.positions).map(nb => (
+            counter += nb
+        ));
+        return counter
+    };
+
     const handleAddPosition = e => {
         const attemptValue = e.target.value;
-        console.log(typeof tactic.tactic.positions[attemptValue] === 'undefined')
-        if(typeof tactic.tactic.positions[attemptValue] === 'undefined'){
-            dbRefTactics.child('positions').update({
-                [e.target.value]: 1
-            })
+        if(nbOfPosition() < 11){ // Make sure there can be more than 11 positions
+            if(typeof tactic.tactic.positions[attemptValue] === 'undefined'){
+                dbRefTactics.child('positions').update({
+                    [e.target.value]: 1
+                })
+            } else {
+                const currentValue = tactic.tactic.positions[attemptValue];
+                dbRefTactics.child('positions').update({
+                    [e.target.value]: currentValue + 1
+                })
+            }
         } else {
-            const currentValue = tactic.tactic.positions[attemptValue];
-            dbRefTactics.child('positions').update({
-                [e.target.value]: currentValue + 1
-            })
+            setStatus({ msg: 'Deja 11 positions', date: new Date(), type: 'warning' })
         }
-
     };
 
     const handleRemovePosition = position => {
@@ -79,10 +91,39 @@ const TacticsInputContent = () => {
                 [position]: currentValue - 1
             })
         }
-    }
+    };
+
+    const handleCloseSnack = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setStatus('')
+    };
+
+    // const customisedSnakeBar = () => {
+    //     return (
+    //         <Snackbar
+    //             anchorOrigin={{
+    //                 vertical: 'bottom',
+    //                 horizontal: 'left',
+    //             }}
+    //             open={status.msg !== null}
+    //             autoHideDuration={2000}
+    //             onClose={handleCloseSnack}
+    //         >
+    //             <SnackBarContent
+    //                 variant="error"
+    //                 className={classes.margin}
+    //                 message={status.msg}
+    //             />
+    //         </Snackbar>
+    //     )
+    // }
 
     React.useEffect(() =>{
         tacticHandler();
+        // eslint-disable-next-line
     }, []);
 
 
@@ -108,6 +149,7 @@ const TacticsInputContent = () => {
                 </Select>
             </FormControl>
             <TacticsEditTable listPositions={tactic.tactic.positions} removePosition={handleRemovePosition}/>
+            {status ? <CustomisedSnackBar variant={status.type} open={status.msg !== null} onClose={handleCloseSnack} message={status.msg} /> : null}
         </div>
     )
 }
