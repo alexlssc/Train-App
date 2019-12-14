@@ -52,7 +52,7 @@ const TrainingsInputContent = props => {
     };
 
 
-    React.useState(() => {
+    React.useEffect(() => {
         listPlayersHandler();
         trainingHandler();
     }, []);

@@ -8,6 +8,8 @@ import MainPage from "./components/Main";
 import PlayerList from './components/PlayerList';
 import TrainPage from './components/Training/AllTrainings';
 import TrainingsInputContent from "./components/Training/TrainingsInput/";
+import TacticsPage from "./components/Tactics"
+import TacticsInput from "./components/Tactics/TacticsInputs";
 import { withAuthentication } from './components/Session';
 
 const App = () => (
@@ -18,6 +20,8 @@ const App = () => (
             <Route path={ROUTES.PLAYER_LIST} exact component={PlayerList}/>
             <Route path={ROUTES.TRAININGS} exact component={TrainPage}/>
             <Route path={ROUTES.INPUTTRAININGS} component={TrainingsInputContent}/>
+            <Route path={ROUTES.TACTICS} exact component={TacticsPage}/>
+            <Route path={ROUTES.INPUTTACTICS} component={TacticsInput}/>
         </Switch>
     </Router>
 );
