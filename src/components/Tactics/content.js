@@ -1,10 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import TacticsTable from "./TacticsTable";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Button, makeStyles} from "@material-ui/core";
 import firebase from "firebase";
 import { useHistory } from "react-router-dom";
-import TextField from '@material-ui/core/TextField';
 
 
 
@@ -46,6 +45,7 @@ const TacticsContent = () => {
 
     React.useEffect(() => {
         tacticsHandler();
+        // eslint-disable-next-line
     }, []);
 
     return (
@@ -62,6 +62,6 @@ const TacticsContent = () => {
             </Button>
         </div>
     )
-}
+};
 
 export default TacticsContent;

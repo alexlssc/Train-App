@@ -55,6 +55,7 @@ const TrainingsInputContent = props => {
     React.useEffect(() => {
         listPlayersHandler();
         trainingHandler();
+        // eslint-disable-next-line
     }, []);
 
     function checkIfUserExists(key) {

@@ -6,12 +6,10 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core";
-import Select from "react-select";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Link} from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
-import Button from "@material-ui/core/Button";
 const useStyles = makeStyles({
     root: {
         width: '100%',

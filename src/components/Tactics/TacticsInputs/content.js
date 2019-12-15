@@ -9,7 +9,6 @@ import * as POSITION from '../../../constants/positions'
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
-import CustomisedSnackBar from "../../SnackBarContent";
 import {useDispatch} from "react-redux";
 import {snackbarOn} from "../../../actions";
 
@@ -61,26 +60,30 @@ const TacticsInputContent = () => {
     };
 
     const nbOfPosition = () => {
-        var counter = 0;
-        Object.values(tactic.tactic.positions).map(nb => (
-            counter += nb
-        ));
-        return counter
+        if(typeof tactic.tactic.positions !== 'undefined'){
+            var counter = 0;
+            Object.values(tactic.tactic.positions).map(nb => (
+                counter += nb
+            ));
+            return counter
+        } else {
+            return 0
+        }
     };
 
     const handleAddPosition = e => {
         const attemptValue = e.target.value;
-        if(nbOfPosition() < 11){ // Make sure there can be more than 11 positions
-            if(typeof tactic.tactic.positions[attemptValue] === 'undefined'){
-                dbRefTactics.child('positions').update({
-                    [e.target.value]: 1
-                }).then(() => {
-                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
-                })
-            } else {
+        if(nbOfPosition() < 11){ // Make sure there can't be more than 11 positions
+            try { // Executed if position is already in the positions list
                 const currentValue = tactic.tactic.positions[attemptValue];
                 dbRefTactics.child('positions').update({
                     [e.target.value]: currentValue + 1
+                }).then(() => {
+                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
+                })
+            } catch (e) { // Executed if position is not already in the position list
+                dbRefTactics.child('positions').update({
+                    [attemptValue]: 1
                 }).then(() => {
                     dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
                 })

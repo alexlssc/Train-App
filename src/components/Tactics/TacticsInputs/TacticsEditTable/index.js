@@ -8,6 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import IconButton from "@material-ui/core/IconButton";
+import * as POSITIONS from '../../../../constants/positions'
 
 const useStyles = makeStyles({
     root: {
@@ -41,8 +42,13 @@ const TacticsEditTable = props => {
 
     const tacticBody = () => {
         return (
-            Object.entries(props.listPositions).map(([position, nb]) => (
-                tacticRow(position, nb)
+            POSITIONS.POSITION.map(position => (
+                Object.entries(props.listPositions).map(([objectPosition, nb]) => {
+                    if(position === objectPosition){
+                        console.log('found: ' + position)
+                        return tacticRow(objectPosition, nb);
+                    }
+                })
             ))
         )
     };
