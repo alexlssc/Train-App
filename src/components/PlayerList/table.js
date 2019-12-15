@@ -127,9 +127,8 @@ const PlayerTable = () => {
     const dbRef = firebase.database().ref('players/');
 
     const handleRemovePlayer = key => {
-        return function () {
-            dbRef.child(key).remove();
-        }
+        console.log(key)
+        dbRef.child(key).remove();
     };
 
 
@@ -193,7 +192,8 @@ const PlayerTable = () => {
                                             className={classes.button}
                                             startIcon={<DeleteIcon />}
                                             size="small"
-                                            onClick={handleRemovePlayer(key)}
+                                            //onClick={handleRemovePlayer(key)}
+                                            onClick={() => { if (window.confirm('Voulez-vous vraiment supprimer ce joueur?')) handleRemovePlayer(key) } }
                                         >
                                             Effacer
                                         </Button>
