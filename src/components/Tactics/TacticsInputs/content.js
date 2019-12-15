@@ -10,6 +10,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import CustomisedSnackBar from "../../SnackBarContent";
+import {useSelector, useDispatch} from "react-redux";
+import {snackbarOn, snackbarOff} from "../../../actions";
 
 
 const useStyles = makeStyles({
@@ -31,14 +33,15 @@ const useStyles = makeStyles({
 
 const TacticsInputContent = () => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const { id } = useParams();
     const dbRefTactics = firebase.database().ref('tactics').child(id);
-    const [status, setStatus] = useState('')
     const [tactic, setTactic] = useState({
         tactic: {
             name: ''
         }
     });
+    const snackbarState = useSelector(state => state.snackbarState)
 
     const tacticHandler = () => {
         const handleNewTactic = snap => {
@@ -53,6 +56,9 @@ const TacticsInputContent = () => {
     const handleChangeName = e => {
         dbRefTactics.update({
             name: e.target.value
+        }).then(() => {
+            //setStatus({ msg: 'Nom mis à jour', date: new Date(), type: 'success' })
+            dispatch(snackbarOn('Nom mis à jour', 'success', new Date()));
         })
     };
 
@@ -70,62 +76,45 @@ const TacticsInputContent = () => {
             if(typeof tactic.tactic.positions[attemptValue] === 'undefined'){
                 dbRefTactics.child('positions').update({
                     [e.target.value]: 1
+                }).then(() => {
+                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
                 })
             } else {
                 const currentValue = tactic.tactic.positions[attemptValue];
                 dbRefTactics.child('positions').update({
                     [e.target.value]: currentValue + 1
+                }).then(() => {
+                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
                 })
             }
         } else {
-            setStatus({ msg: 'Deja 11 positions', date: new Date(), type: 'warning' })
+            dispatch(snackbarOn('Déjà 11 positions', 'warning', new Date()))
         }
     };
 
     const handleRemovePosition = position => {
         if(tactic.tactic.positions[position] === 1) {
-            dbRefTactics.child('positions').child(position).remove();
+            dbRefTactics.child('positions').child(position).remove().then(() => {
+                   // setStatus({ msg: 'Poste enlevé', date: new Date(), type: 'success' })
+                dispatch(snackbarOn('Poste enlevé', 'success', new Date()));
+                }
+            );
         } else{
             const currentValue = tactic.tactic.positions[position];
             dbRefTactics.child('positions').update({
                 [position]: currentValue - 1
-            })
+            }).then(() => {
+                dispatch(snackbarOn('Poste enlevé', 'success', new Date()));
+                }
+            )
         }
     };
 
-    const handleCloseSnack = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setStatus('')
-    };
-
-    // const customisedSnakeBar = () => {
-    //     return (
-    //         <Snackbar
-    //             anchorOrigin={{
-    //                 vertical: 'bottom',
-    //                 horizontal: 'left',
-    //             }}
-    //             open={status.msg !== null}
-    //             autoHideDuration={2000}
-    //             onClose={handleCloseSnack}
-    //         >
-    //             <SnackBarContent
-    //                 variant="error"
-    //                 className={classes.margin}
-    //                 message={status.msg}
-    //             />
-    //         </Snackbar>
-    //     )
-    // }
 
     React.useEffect(() =>{
         tacticHandler();
         // eslint-disable-next-line
     }, []);
-
 
     return (
         <div>
@@ -149,7 +138,7 @@ const TacticsInputContent = () => {
                 </Select>
             </FormControl>
             <TacticsEditTable listPositions={tactic.tactic.positions} removePosition={handleRemovePosition}/>
-            {status ? <CustomisedSnackBar variant={status.type} open={status.msg !== null} onClose={handleCloseSnack} message={status.msg} /> : null}
+            {snackbarState.status ? <CustomisedSnackBar variant={snackbarState.status.category} open={snackbarState.status !== null} onClose={() => dispatch(snackbarOff())} message={snackbarState.status.msg} /> : null}
         </div>
     )
 }

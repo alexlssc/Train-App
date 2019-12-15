@@ -14,7 +14,6 @@ const useStyles = makeStyles({
     }
 });
 
-
 const TrainingContent = () => {
     const classes = useStyles();
 
