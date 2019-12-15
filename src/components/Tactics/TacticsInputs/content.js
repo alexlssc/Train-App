@@ -10,8 +10,8 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import CustomisedSnackBar from "../../SnackBarContent";
-import {useSelector, useDispatch} from "react-redux";
-import {snackbarOn, snackbarOff} from "../../../actions";
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../../actions";
 
 
 const useStyles = makeStyles({
@@ -41,8 +41,6 @@ const TacticsInputContent = () => {
             name: ''
         }
     });
-    const snackbarState = useSelector(state => state.snackbarState)
-
     const tacticHandler = () => {
         const handleNewTactic = snap => {
             if (snap.val()) setTactic({tactic: snap.val()});
@@ -138,7 +136,6 @@ const TacticsInputContent = () => {
                 </Select>
             </FormControl>
             <TacticsEditTable listPositions={tactic.tactic.positions} removePosition={handleRemovePosition}/>
-            {snackbarState.status ? <CustomisedSnackBar variant={snackbarState.status.category} open={snackbarState.status !== null} onClose={() => dispatch(snackbarOff())} message={snackbarState.status.msg} /> : null}
         </div>
     )
 }

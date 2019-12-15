@@ -17,6 +17,8 @@ import * as POSITION from "../../../constants/positions";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import firebase from "firebase";
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../../actions";
 
 const useStyles = makeStyles(theme => ({
 
@@ -73,6 +75,7 @@ const TransitionsModal = props => {
     const [lastName, setLastName] = React.useState('');
     const [DOB, setDOB] = React.useState(new Date());
     const [positions, setPositions] = React.useState([]);
+    const dispatch = useDispatch();
 
     const db = firebase.database();
 
@@ -136,7 +139,9 @@ const TransitionsModal = props => {
                 else
                     handleClear();
                     props.handleClose();
-            })
+            }).then(() => {
+                dispatch(snackbarOn('Joueur ajouté', 'success', new Date()))
+        })
     }
 
 
@@ -156,7 +161,9 @@ const TransitionsModal = props => {
                 else
                     handleClear();
                 props.handleClose();
-            })
+            }).then(() => {
+                dispatch(snackbarOn('Joueur mis à jour', 'success', new Date()))
+        })
     }
 
     // Clear current state of next use and close

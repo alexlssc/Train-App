@@ -13,6 +13,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import Modal from './Modal';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import PropTypes from 'prop-types';
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../actions";
 
 const useStyles = makeStyles({
     root: {
@@ -94,6 +96,7 @@ EnhancedTableHead.propTypes = {
 
 const PlayerTable = () => {
     const classes = useStyles();
+    const dispatch = useDispatch()
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('lastName');
@@ -102,6 +105,7 @@ const PlayerTable = () => {
     const [listPlayers, setListPlayers] = React.useState(initial_state);
     const [playerEdit, setPlayerEdit] = React.useState({player: ''});
     const [keyPlayerEdit, setKeyPlayerEdit] = React.useState('');
+
 
     const handleRequestSort = (event, property) => {
         const isDesc = orderBy === property && order === 'desc';
@@ -127,8 +131,9 @@ const PlayerTable = () => {
     const dbRef = firebase.database().ref('players/');
 
     const handleRemovePlayer = key => {
-        console.log(key)
-        dbRef.child(key).remove();
+        dbRef.child(key).remove().then(() => {
+            dispatch(snackbarOn('Joueur enlevé', 'success', new Date()))
+        });
     };
 
 
