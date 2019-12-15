@@ -197,7 +197,6 @@ const PlayerTable = () => {
                                             className={classes.button}
                                             startIcon={<DeleteIcon />}
                                             size="small"
-                                            //onClick={handleRemovePlayer(key)}
                                             onClick={() => { if (window.confirm('Voulez-vous vraiment supprimer ce joueur?')) handleRemovePlayer(key) } }
                                         >
                                             Effacer

@@ -11,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Link} from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
+import Button from "@material-ui/core/Button";
 const useStyles = makeStyles({
     root: {
         width: '100%',
@@ -39,7 +40,8 @@ const TacticsTable = props => {
                         </Link>
                     </TableCell>
                     <TableCell align={'right'} style={{width: 50}}>
-                        <IconButton aria-label="delete" onClick={() => props.deleteTactic(key)} >
+                        <IconButton aria-label="delete" onClick={() => { if (window.confirm('Voulez-vous vraiment supprimer cette tactique?')) props.deleteTactic(key)}}
+                        >
                             <DeleteIcon />
                         </IconButton>
                     </TableCell>

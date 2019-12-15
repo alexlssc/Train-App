@@ -47,7 +47,7 @@ const WeekTrainingTable = props => {
                                 </Link>
                             </TableCell>
                             <TableCell align={'right'} style={{width: 50}}>
-                                <IconButton aria-label="delete" onClick={() => props.deleteHandler(key)} >
+                                <IconButton aria-label="delete" onClick={() => { if (window.confirm('Voulez-vous vraiment supprimer cet entraînement?')) props.deleteHandler(key)}} >
                                     <DeleteIcon />
                                 </IconButton>
                             </TableCell>
