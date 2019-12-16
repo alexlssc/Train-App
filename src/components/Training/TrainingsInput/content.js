@@ -8,6 +8,8 @@ import FormControl from "@material-ui/core/FormControl";
 import {Paper} from "material-ui";
 import TableTraining from "./TableTraining";
 import { useParams } from "react-router-dom";
+import {snackbarOn} from "../../../actions";
+import{useDispatch} from "react-redux";
 
 const useStyles = makeStyles({
     root: {
@@ -25,6 +27,7 @@ const useStyles = makeStyles({
 
 const TrainingsInputContent = props => {
     const { id } = useParams();
+    const dispatch = useDispatch();
     const [listPlayers, setListPlayers] = useState({player: ''});
     const [trainingData, setTrainingData] = useState({training: ''});
 
@@ -70,7 +73,11 @@ const TrainingsInputContent = props => {
                 firstName: e.target.value[0].firstName,
                 lastName: e.target.value[0].lastName,
                 performance: 0
+            }).then(() => {
+                dispatch(snackbarOn('Joueur ajouté', 'success', new Date()));
             })
+        } else {
+            dispatch(snackbarOn('Joueur déjà présent', 'warning', new Date()));
         }
 
     };
@@ -104,7 +111,7 @@ const TrainingsInputContent = props => {
         });
         let sum = allPerformances.reduce((previous, current) => current += previous);
         let avg = sum / allPerformances.length;
-        return avg
+        return Math.round(avg * 10) / 10;
     };
 
     const handleDeletePlayer = key => {
