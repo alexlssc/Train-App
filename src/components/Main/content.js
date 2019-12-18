@@ -19,6 +19,9 @@ const DashboardContent  = () => {
     const [rankedDone, setRankedDone] = useState(false)
     const [rankedPerformances, setRankedPerformances] = useState();
 
+    let threeBestKeeper = [];
+    let threeBestCenterBack = []
+
 
     const handleGetPlayers = async () => {
         const allPlayersSnapshot = await dbRefPlayers.once("value");
@@ -66,9 +69,29 @@ const DashboardContent  = () => {
                setRankedPerformances(playerSorted);
                setRankedDone(true);
            }
+           if(loadingFinish === true && rankedDone === true){
+               threeBestKeeper = sortPlayerPerPositionPerPerformance('GARDIEN');
+               threeBestCenterBack = sortPlayerPerPositionPerPerformance('DEFENSEUR CENTRAL');
+           }
         } catch (e) {
             console.log(e)
         }
+    };
+
+    const sortPlayerPerPositionPerPerformance = targetPosition => {
+        let threeBestPlayer = Array(3);
+        let count = 0;
+        for(let playerId of rankedPerformances){
+            const tempPlayer = playersData.players[playerId];
+            if(tempPlayer.positions.includes(targetPosition)){
+                threeBestPlayer[count] = playerId;
+                count++;
+                if(count === 2){
+                    return threeBestPlayer;
+                }
+            }
+        }
+        return threeBestPlayer;
     };
 
     React.useEffect(() => {
@@ -89,6 +112,18 @@ const DashboardContent  = () => {
                 bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 3]] : null}
                 secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 2]] : null}
                 thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 1]] : null}
+            />
+            <BoxBestPlayer
+                topic='Meilleur Gardiens'
+                bestPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[0]] : null}
+                secondPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[1]] : null}
+                thirdPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[2]] : null}
+            />
+            <BoxBestPlayer
+                topic='Meilleur Défenseur Central'
+                bestPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[0]] : null}
+                secondPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[1]] : null}
+                thirdPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[2]] : null}
             />
         </div>
     )
