@@ -20,7 +20,16 @@ const useStyles = makeStyles(theme => ({
 
 const BoxBestPlayer = props => {
     const classes = useStyles();
-    const { topic, bestName, bestPerformance, secondName, secondPerformance, thirdName, thirdPerformance} = props
+    const { topic, bestPlayer, secondPlayer, thirdPlayer} = props;
+
+    const bestName = bestPlayer !== null ? bestPlayer.lastName + ' ' + bestPlayer.firstName : 'NaN';
+    const bestPerformance = bestPlayer !== null ? bestPlayer.avgPerformance : 'NaN';
+    const secondName = secondPlayer !== null ? secondPlayer.lastName + ' ' + secondPlayer.firstName : 'NaN';
+    const secondPerformance = secondPlayer !== null ? secondPlayer.avgPerformance : 'NaN';
+    const thirdName = thirdPlayer !== null ? thirdPlayer.lastName + ' ' + thirdPlayer.firstName : 'NaN';
+    const thirdPerformance = thirdPlayer !== null ? thirdPlayer.avgPerformance : 'NaN';
+
+
    return (
        <Card className={classes.card}>
            <CardContent>
