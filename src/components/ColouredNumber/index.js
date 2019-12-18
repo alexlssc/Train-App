@@ -10,6 +10,7 @@ const useStyles = makeStyles(theme => ({
         width: 30,
         height: 30,
         borderRadius: 5,
+        float: 'right'
     },
     great: {
         backgroundColor: '#4CAF50'

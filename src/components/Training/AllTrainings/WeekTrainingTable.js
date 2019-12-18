@@ -10,6 +10,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import {Link} from "react-router-dom";
+import ColouredNumber from "../../ColouredNumber";
 
 const useStyles = makeStyles({
     root: {
@@ -36,7 +37,9 @@ const WeekTrainingTable = props => {
                     {Object.entries(props.trainings).map(([key, trainingObject]) => (
                         <TableRow key={key}>
                             <TableCell>{trainingObject['date']}</TableCell>
-                            <TableCell align={"right"}>{trainingObject['overallPerformance']}</TableCell>
+                            <TableCell align={"right"}>
+                                <ColouredNumber performance={trainingObject['overallPerformance']}/>
+                            </TableCell>
                             <TableCell align={'right'} style={{width: 50}}>
                                 <Link
                                     to={'trainings/' + key}
