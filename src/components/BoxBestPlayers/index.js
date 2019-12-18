@@ -4,6 +4,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography"
 import { makeStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
+import ColouredNumber from "./ColouredNumber";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -34,22 +35,22 @@ const BoxBestPlayer = props => {
        <Card className={classes.card}>
            <CardContent>
                <Typography className={classes.title} color="textPrimary" gutterBottom>
-                   Meilleur {topic}
+                   {topic}
                </Typography>
                <Divider/>
                <div className={classes.player}>
                    <p>{bestName}</p>
-                   <p>{bestPerformance}</p>
+                   <ColouredNumber performance={bestPerformance}/>
                </div>
                <Divider/>
                <div className={classes.player}>
                    <p>{secondName}</p>
-                   <p>{secondPerformance}</p>
+                   <ColouredNumber performance={secondPerformance}/>
                </div>
                <Divider/>
                <div className={classes.player}>
                    <p>{thirdName}</p>
-                   <p>{thirdPerformance}</p>
+                   <ColouredNumber performance={thirdPerformance}/>
                </div>
                <Divider/>
            </CardContent>

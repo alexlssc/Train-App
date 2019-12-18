@@ -6,7 +6,7 @@ import firebase from "firebase";
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'space-around'
     }
 }));
 
@@ -16,15 +16,14 @@ const DashboardContent  = () => {
 
     const [playersData, setPlayersData] = useState({players: ''});
     const [loadingFinish, setLoadingFinish] = useState(false);
-    const [playersCount, setPlayersCount] = useState(0);
-    const [rankedPerformance, setRankedPerformances] = useState();
+    const [rankedDone, setRankedDone] = useState(false)
+    const [rankedPerformances, setRankedPerformances] = useState();
 
 
     const handleGetPlayers = async () => {
         const allPlayersSnapshot = await dbRefPlayers.once("value");
         try{
             const allPlayersData = allPlayersSnapshot.val();
-            setPlayersCount(Object.keys(allPlayersData).length);
             await Promise.all(Object.entries(allPlayersData).map(async ([playerId, playerObject]) => {
                 const playerTrainingDataSnapshot = await dbRefPlayers.child(playerId).child('trainingsAttended').limitToLast(7).once('value');
                 try{
@@ -60,11 +59,12 @@ const DashboardContent  = () => {
         return Math.round(avg * 10) / 10;
     };
 
-    const getBest3Players = () => {
+    const sortPlayerPerPerformance = function(){
         try {
-           if(loadingFinish){
+           if(loadingFinish === true && rankedDone === false){
                const playerSorted = Object.keys(playersData.players).sort(function(a,b){return playersData.players[a].avgPerformance - playersData.players[b].avgPerformance}).reverse();
                setRankedPerformances(playerSorted);
+               setRankedDone(true);
            }
         } catch (e) {
             console.log(e)
@@ -72,17 +72,23 @@ const DashboardContent  = () => {
     };
 
     React.useEffect(() => {
-        handleGetPlayers()
+        handleGetPlayers();
         // eslint-disable-next-line
     }, []);
     return (
         <div className={classes.root}>
-            {getBest3Players()}
+            {loadingFinish === true ? sortPlayerPerPerformance() : null}
             <BoxBestPlayer
-                topic='Joueur'
-                bestPlayer={typeof rankedPerformance !== 'undefined' ? playersData.players[rankedPerformance[0]] : null}
-                secondPlayer={typeof rankedPerformance !== 'undefined' ? playersData.players[rankedPerformance[1]] : null}
-                thirdPlayer={typeof rankedPerformance !== 'undefined' ? playersData.players[rankedPerformance[2]] : null}
+                topic='Meilleur performance'
+                bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[0]] : null}
+                secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[1]] : null}
+                thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[2]] : null}
+            />
+            <BoxBestPlayer
+                topic='Pire performance'
+                bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 3]] : null}
+                secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 2]] : null}
+                thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 1]] : null}
             />
         </div>
     )
