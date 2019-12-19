@@ -2,11 +2,13 @@ import React, {useState} from 'react';
 import BoxBestPlayer from "../BoxBestPlayers";
 import {makeStyles} from "@material-ui/styles";
 import firebase from "firebase";
+import * as POSITIONS from '../../constants/positions'
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
-        justifyContent: 'space-around'
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
     }
 }));
 
@@ -16,12 +18,9 @@ const DashboardContent  = () => {
 
     const [playersData, setPlayersData] = useState({players: ''});
     const [loadingFinish, setLoadingFinish] = useState(false);
-    const [rankedDone, setRankedDone] = useState(false)
+    const [rankedDone, setRankedDone] = useState(false);
     const [rankedPerformances, setRankedPerformances] = useState();
-
-    let threeBestKeeper = [];
-    let threeBestCenterBack = []
-
+    let allThreeBest = [];
 
     const handleGetPlayers = async () => {
         const allPlayersSnapshot = await dbRefPlayers.once("value");
@@ -70,13 +69,31 @@ const DashboardContent  = () => {
                setRankedDone(true);
            }
            if(loadingFinish === true && rankedDone === true){
-               threeBestKeeper = sortPlayerPerPositionPerPerformance('GARDIEN');
-               threeBestCenterBack = sortPlayerPerPositionPerPerformance('DEFENSEUR CENTRAL');
+               // Find three best player per position and add it to array
+               for(let position of POSITIONS.POSITION){
+                   allThreeBest.push(sortPlayerPerPositionPerPerformance(position))
+               }
            }
         } catch (e) {
             console.log(e)
         }
     };
+
+    const displayBoxes = () => {
+        let output = [];
+        allThreeBest.forEach((oneThreeBest, index) => {
+            if(typeof oneThreeBest[0] !== 'undefined'){ //Display box only if there are players to display
+                output.push(
+                    <BoxBestPlayer
+                    topic={`MEILLEURS ${POSITIONS.POSITION[index]}`}
+                    bestPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[0]] : null}
+                    secondPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[1]] : null}
+                    thirdPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[2]] : null}
+                    />)
+            }
+        });
+        return output;
+    }
 
     const sortPlayerPerPositionPerPerformance = targetPosition => {
         let threeBestPlayer = Array(3);
@@ -86,7 +103,7 @@ const DashboardContent  = () => {
             if(tempPlayer.positions.includes(targetPosition)){
                 threeBestPlayer[count] = playerId;
                 count++;
-                if(count === 2){
+                if(count === 3){
                     return threeBestPlayer;
                 }
             }
@@ -102,29 +119,18 @@ const DashboardContent  = () => {
         <div className={classes.root}>
             {loadingFinish === true ? sortPlayerPerPerformance() : null}
             <BoxBestPlayer
-                topic='Meilleur performance'
+                topic='MEILLEURS PERFORMANCES'
                 bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[0]] : null}
                 secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[1]] : null}
                 thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[2]] : null}
             />
             <BoxBestPlayer
-                topic='Pire performance'
+                topic='PIRES PERFORMANCES'
                 bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 3]] : null}
                 secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 2]] : null}
                 thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 1]] : null}
             />
-            <BoxBestPlayer
-                topic='Meilleur Gardiens'
-                bestPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[0]] : null}
-                secondPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[1]] : null}
-                thirdPlayer={threeBestKeeper.length !== 0 ? playersData.players[threeBestKeeper[2]] : null}
-            />
-            <BoxBestPlayer
-                topic='Meilleur Défenseur Central'
-                bestPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[0]] : null}
-                secondPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[1]] : null}
-                thirdPlayer={threeBestCenterBack.length !== 0 ? playersData.players[threeBestCenterBack[2]] : null}
-            />
+            {allThreeBest.length !==0 ? displayBoxes() : null}
         </div>
     )
 };

@@ -9,7 +9,8 @@ import ColouredNumber from "../ColouredNumber";
 const useStyles = makeStyles(theme => ({
     card: {
         minWidth: 275,
-        width: '20%'
+        width: '20%',
+        marginBottom: 10,
 
     },
     player: {
