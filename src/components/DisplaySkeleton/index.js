@@ -86,6 +86,10 @@ function ResponsiveDrawer(props) {
                     <ListItemIcon><AssignmentIndIcon/></ListItemIcon>
                     <ListItemText primary="Tactiques"/>
                 </ListItem>
+                <ListItem button component={Link} to={ROUTES.BESTELEVEN} key="listPlayer">
+                    <ListItemIcon><AssignmentIndIcon/></ListItemIcon>
+                    <ListItemText primary="Meilleur 11"/>
+                </ListItem>
             </List>
             <Divider />
             <List>

@@ -5,3 +5,4 @@ export const TRAININGS = '/trainings';
 export const INPUTTRAININGS = '/trainings/:id';
 export const TACTICS = '/tactics';
 export const INPUTTACTICS = '/tactics/:id';
+export const BESTELEVEN = '/best-eleven';

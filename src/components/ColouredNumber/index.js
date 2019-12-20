@@ -30,6 +30,9 @@ const useStyles = makeStyles(theme => ({
     terrible: {
         backgroundColor: '#D50000'
     },
+    unknown: {
+        backgroundColor: '#9E9E9E'
+    },
     text: {
         fontWeight: 'bold'
     }
@@ -51,6 +54,8 @@ const ColouredNumber = props => {
         variant = 'bad';
     } else if (performance <= 1.5 && performance >= 1){
         variant = 'terrible';
+    } else if (performance < 1){
+        variant = 'unknown'
     }
 
     return(

@@ -45,7 +45,6 @@ const TacticsEditTable = props => {
             POSITIONS.POSITION.map(position => (
                 Object.entries(props.listPositions).map(([objectPosition, nb]) => {
                     if(position === objectPosition){
-                        console.log('found: ' + position)
                         return tacticRow(objectPosition, nb);
                     }
                 })
