@@ -2,11 +2,27 @@ import React, {useState} from "react";
 import TableBestEleven from "./TableBestEleven";
 import firebase from "firebase";
 import * as POSITIONS from "../../constants/positions";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import {Paper} from "material-ui";
+import {makeStyles} from "@material-ui/styles";
+
+const useStyles = makeStyles({
+    form: {
+        width: '100%',
+    },
+    select: {
+        width: '100%',
+    }
+});
 
 const BestElevenContent = () => {
-
+    const classes = useStyles();
     const [selectedTactic, setSelectedTactic] = useState(null);
     const [playersData, setPlayersData] = useState({players: ''});
+    const [allTactics, setAllTactics] = useState(null)
     const [loadingFinish, setLoadingFinish] = useState(false);
     const [rankedDone, setRankedDone] = useState(false);
     const [rankedPerformances, setRankedPerformances] = useState();
@@ -19,11 +35,16 @@ const BestElevenContent = () => {
     const handleGetTactics = async() => {
         const tacticSnapshot = await dbRefTactic.once('value');
         try{
-            Object.entries(tacticSnapshot.val()).map(([tacticId, tacticObject]) => {
-                if(tacticObject.name === '442'){
-                    setSelectedTactic({tacticId: tacticId, tacticObject: tacticObject})
-                }
-            });
+            // Object.entries(tacticSnapshot.val()).map(([tacticId, tacticObject]) => {
+            //     if(tacticObject.name === '442'){
+            //         setSelectedTactic({tacticId: tacticId, tacticObject: tacticObject})
+            //     }
+            // });
+            const tacticsData = tacticSnapshot.val();
+            setAllTactics(tacticsData);
+            // Set first tactic as default
+            setSelectedTactic(tacticsData[Object.keys(tacticsData)[0]])
+
         }catch (e) {
             console.log("Can't extract data from database");
         }
@@ -103,6 +124,16 @@ const BestElevenContent = () => {
         return threeBestPlayer;
     };
 
+    const displaySelectData = () =>{
+        let output = []
+
+        return output;
+    };
+
+    const handleChangeTactic = e => {
+        setSelectedTactic(e.target.value)
+    }
+
     React.useEffect(() => {
         handleGetTactics();
         handleGetPlayers();
@@ -112,8 +143,23 @@ const BestElevenContent = () => {
     return (
         <div>
             {loadingFinish === true ? sortPlayerPerPerformance() : null}
+            <Paper>
+                <FormControl variant="outlined" className={classes.form}>
+                    <InputLabel id="demo-simple-select-outlined-label">
+                        Choisissez une formation
+                    </InputLabel>
+                    <Select
+                        labelId="demo-simple-select-outlined-label"
+                        id="demo-simple-select-outlined"
+                        value={selectedTactic !== null ? selectedTactic : ''}
+                        onChange={e => handleChangeTactic(e)}
+                    >
+                        {allTactics !== null ? Object.values(allTactics).map(oneTactic => (<MenuItem key={oneTactic.name} value={oneTactic}>{oneTactic.name}</MenuItem>)) : ''}
+                    </Select>
+                </FormControl>
+            </Paper>
             <TableBestEleven
-                selectedTactic={selectedTactic !== null ? selectedTactic.tacticObject : null}
+                selectedTactic={selectedTactic !== null ? selectedTactic : null}
                 allThreeBest={allThreeBest.length !== 0 ? allThreeBest : null}
             />
         </div>

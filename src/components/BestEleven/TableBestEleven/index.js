@@ -16,6 +16,7 @@ const useStyles = makeStyles({
     },
     table: {
         minWidth: 650,
+        marginTop: 15,
     },
     playerCell: {
         display: 'flex',
