@@ -15,6 +15,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -87,7 +88,7 @@ function ResponsiveDrawer(props) {
                     <ListItemText primary="Tactiques"/>
                 </ListItem>
                 <ListItem button component={Link} to={ROUTES.BESTELEVEN} key="listPlayer">
-                    <ListItemIcon><AssignmentIndIcon/></ListItemIcon>
+                    <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Meilleur 11"/>
                 </ListItem>
             </List>

@@ -55,7 +55,7 @@ const ColouredNumber = props => {
     } else if (performance <= 1.5 && performance >= 1){
         variant = 'terrible';
     } else if (performance < 1){
-        variant = 'unknown'
+        variant = 'unknown';
     }
 
     return(

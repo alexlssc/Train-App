@@ -1,4 +1,5 @@
 import app from '@firebase/app'
+import firebase from "firebase";
 require('firebase/auth');
 
 const config = {
@@ -10,11 +11,13 @@ const config = {
     messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
     appId: process.env.REACT_APP_APP_ID,
     measurementId: process.env.REACT_APP_MEASUREMENT_ID
-}
+};
+
 class Firebase {
     constructor(){
-        app.initializeApp(config)
+        app.initializeApp(config);
         this.auth = app.auth();
+        const performance = firebase.performance();
     }
 
     // *** Auth API ***

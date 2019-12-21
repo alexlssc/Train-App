@@ -74,6 +74,7 @@ const TransitionsModal = props => {
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [DOB, setDOB] = React.useState(new Date());
+    const [isDOBValid, setIsDOBValid] = React.useState(true);
     const [positions, setPositions] = React.useState([]);
     const dispatch = useDispatch();
 
@@ -170,9 +171,21 @@ const TransitionsModal = props => {
     const handleModalClose = () => {
         handleClear();
         props.handleClose();
+    };
+
+    // REGEX
+    function hasNumber(myString) {
+        return /\d/.test(myString);
     }
 
-
+    // Disable button if data is not suited
+    function isButtonDisabled(){
+        if(firstName === '' || hasNumber(firstName) || firstName === ' ' || lastName === '' || hasNumber(lastName) || lastName === ' ' || isDOBValid === false ){
+            return true
+        } else {
+            return false
+        }
+    }
 
     return (
         <div>
@@ -191,9 +204,28 @@ const TransitionsModal = props => {
                 <Fade in={props.open}>
                     <div className={classes.paper}>
                         <h2 id="transition-modal-title">{props.playerEdit ? 'Editer le joueur' : 'Ajouter un joueur'}</h2>
-                        <form className={classes.form} noValidate autoComplete="off">
-                            <TextField className={classes.textField} id="playerFirstName" name="firstname" label= "Prénom" floatingLabelText="Prénom" variant="outlined" value={firstName} onChange={e => setFirstName(e.target.value)}/>
-                            <TextField className={classes.textField} id="playerSecondName" name="secondName" label= "Nom de famille" floatingLabelText="Nom de famille" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)}/>
+                        <form className={classes.form} autoComplete="off">
+                            <TextField
+                                className={classes.textField}
+                                id="playerFirstName" name="firstname"
+                                label= "Prénom"
+                                floatingLabelText="Prénom"
+                                variant="outlined"
+                                value={firstName}
+                                onChange={e => setFirstName(e.target.value)}
+                                error={hasNumber(firstName)}
+                            />
+                            <TextField
+                                className={classes.textField}
+                                id="playerSecondName"
+                                name="secondName"
+                                label= "Nom de famille"
+                                floatingLabelText="Nom de famille"
+                                variant="outlined"
+                                value={lastName}
+                                onChange={e => setLastName(e.target.value)}
+                                error={hasNumber(lastName)}
+                            />
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                 <KeyboardDatePicker
                                     disableToolbar
@@ -235,7 +267,14 @@ const TransitionsModal = props => {
                                 </Select>
                             </FormControl>
                             <div className={classes.buttonContainer}>
-                                <Button variant="contained" size="large" color="primary" styles={classes.Button} onClick={props.playerEdit ? updatePlayer : pushNewPlayer}>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    color="primary"
+                                    styles={classes.Button}
+                                    onClick={props.playerEdit ? updatePlayer : pushNewPlayer}
+                                    disabled={isButtonDisabled()}
+                                >
                                     {props.playerEdit ? 'Editer joueur' : 'Ajouter joueur'}
                                 </Button>
                                 <Button variant="contained" size="large" color="secondary" styles={classes.Button} onClick={handleClear}>

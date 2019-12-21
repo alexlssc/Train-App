@@ -8,6 +8,8 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {Paper} from "material-ui";
 import {makeStyles} from "@material-ui/styles";
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../actions";
 
 const useStyles = makeStyles({
     form: {
@@ -20,6 +22,7 @@ const useStyles = makeStyles({
 
 const BestElevenContent = () => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const [selectedTactic, setSelectedTactic] = useState(null);
     const [playersData, setPlayersData] = useState({players: ''});
     const [allTactics, setAllTactics] = useState(null)
@@ -35,11 +38,6 @@ const BestElevenContent = () => {
     const handleGetTactics = async() => {
         const tacticSnapshot = await dbRefTactic.once('value');
         try{
-            // Object.entries(tacticSnapshot.val()).map(([tacticId, tacticObject]) => {
-            //     if(tacticObject.name === '442'){
-            //         setSelectedTactic({tacticId: tacticId, tacticObject: tacticObject})
-            //     }
-            // });
             const tacticsData = tacticSnapshot.val();
             setAllTactics(tacticsData);
             // Set first tactic as default
@@ -123,16 +121,15 @@ const BestElevenContent = () => {
         }
         return threeBestPlayer;
     };
-
-    const displaySelectData = () =>{
-        let output = []
-
-        return output;
-    };
-
     const handleChangeTactic = e => {
-        setSelectedTactic(e.target.value)
-    }
+        try{
+            setSelectedTactic(e.target.value)
+            dispatch(snackbarOn('Nouvelle tactique selectionné', 'success', new Date()));
+        } catch (e) {
+            dispatch(snackbarOn('Nouvelle tactique selectionné', 'success', new Date()));
+        }
+
+    };
 
     React.useEffect(() => {
         handleGetTactics();
