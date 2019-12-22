@@ -24,6 +24,11 @@ const useStyles = makeStyles({
 
 const WeekTrainingTable = props => {
     const classes = useStyles();
+
+    function dateToNum(d) {
+        d = d.split("/"); return Number(d[2]+d[1]+d[0]);
+    }
+
     return (
         <Paper className={classes.root}>
             <Table className={classes.table} aria-label="simple table">
@@ -34,7 +39,11 @@ const WeekTrainingTable = props => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {Object.entries(props.trainings).map(([key, trainingObject]) => (
+                    {Object.entries(props.trainings)
+                        .sort(
+                            (a,b) => dateToNum(b[1].date) - dateToNum(a[1].date)
+                        )
+                        .map(([key, trainingObject]) => (
                         <TableRow key={key}>
                             <TableCell>{trainingObject['date']}</TableCell>
                             <TableCell align={"right"}>
