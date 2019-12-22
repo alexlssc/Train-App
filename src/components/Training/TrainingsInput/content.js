@@ -10,6 +10,10 @@ import TableTraining from "./TableTraining";
 import { useParams } from "react-router-dom";
 import {snackbarOn} from "../../../actions";
 import{useDispatch} from "react-redux";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import {Button} from "@material-ui/core";
+import DateFnsUtils from "@date-io/date-fns";
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 
 const useStyles = makeStyles({
     root: {
@@ -21,11 +25,22 @@ const useStyles = makeStyles({
     },
     select: {
         width: '100%',
+    },
+    button: {
+        marginTop: 20,
+        float: 'right',
+    },
+    buttonDate:{
+        marginLeft: 20
+    },
+    dateContainer:{
+        display: 'flex',
+        alignItems: 'center'
     }
 });
 
 
-const TrainingsInputContent = props => {
+const TrainingsInputContent = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const [listPlayers, setListPlayers] = useState({player: ''});
@@ -34,8 +49,6 @@ const TrainingsInputContent = props => {
     const dbRefPlayers = firebase.database().ref('/players');
     const dbRefTraining = firebase.database().ref('trainings').child(id);
     const classes = useStyles();
-
-
 
     const listPlayersHandler = () => {
         const handlePlayers = snap => {
@@ -79,7 +92,18 @@ const TrainingsInputContent = props => {
         } else {
             dispatch(snackbarOn('Joueur déjà présent', 'warning', new Date()));
         }
+    };
 
+    const handleAddAllPlayers = () => {
+        for(let [playerKey, playerObject] of Object.entries(listPlayers.player)){
+            if(!checkIfUserExists(playerKey)){
+                dbRefTraining.child('playerAttendees').child(playerKey).set({
+                    firstName: playerObject.firstName,
+                    lastName: playerObject.lastName,
+                    performance: 0
+                })
+            }
+        }
     };
 
 
@@ -97,7 +121,8 @@ const TrainingsInputContent = props => {
         });
 
         dbRefPlayers.child(key).child('trainingsAttended').child(id).update({
-            performance: value.value
+            performance: value.value,
+            date: trainingData.training.date
         })
 
     };
@@ -121,8 +146,74 @@ const TrainingsInputContent = props => {
         dbRefPlayers.child(key).child('trainingsAttended').child(id).remove();
     };
 
+    const handleUpdateDate = () => {
+        try{
+            if(hasNumber(trainingData.training.date)){
+                dbRefTraining.update({
+                    date: trainingData.training.date
+                }).then(
+                    dispatch(snackbarOn('Date mis à jour', 'success', new Date()))
+                )
+            } else {
+                dispatch(snackbarOn('Format date invalide', 'error', new Date()))
+            }
+        } catch (e) {
+            dispatch(snackbarOn('Erreur avec date', 'error', new Date()))
+        }
+    };
+
+    // Format date to dd/MM/yyyy
+    function rightFormatDate(oldDate){
+        try{
+            const dateParts = oldDate.split('/');
+            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        } catch (e) {
+            return null
+        }
+    }
+
+    // REGEX
+    function hasNumber(myString) {
+        return /\d/.test(myString);
+    }
+
     return (
         <div>
+            <div className={classes.dateContainer}>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                        disableToolbar
+                        variant="inline"
+                        format="dd/MM/yyyy"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="Changer la date"
+                        value={rightFormatDate(trainingData.training.date)}
+                        disableFuture='true'
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                        onChange={date => setTrainingData(prevState => ({
+                            training:{
+                                ...prevState.training,
+                                date: date != null ? date.toLocaleString().slice(0,10) : ''
+                            }
+                        }))}
+                        autoOk={true}
+                    />
+                </MuiPickersUtilsProvider>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddCircleIcon/>}
+                    className={classes.buttonDate}
+                    //
+                    onClick={() => handleUpdateDate()}
+                >
+                    Changer date
+                </Button>
+
+            </div>
             <h1>Ajouter un entraînement</h1>
             <Paper>
                 <FormControl variant="outlined" className={classes.form}>
@@ -148,6 +239,16 @@ const TrainingsInputContent = props => {
                 updatePlayerAttendee={handleUpdatePlayerAttendee}
                 deletePlayerAttendee={handleDeletePlayer}
             />
+            <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddCircleIcon/>}
+                className={classes.button}
+                //
+                onClick={() => handleAddAllPlayers()}
+            >
+                 Ajouter tous les joueurs
+            </Button>
         </div>
     )
 };

@@ -78,7 +78,7 @@ const TrainingContent = () => {
         });
 
         await dbRef.child(key).remove();
-    }
+    };
 
     return (
         <div>

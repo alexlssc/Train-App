@@ -74,7 +74,6 @@ const TransitionsModal = props => {
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [DOB, setDOB] = React.useState(new Date());
-    const [isDOBValid, setIsDOBValid] = React.useState(true);
     const [positions, setPositions] = React.useState([]);
     const dispatch = useDispatch();
 
@@ -180,11 +179,7 @@ const TransitionsModal = props => {
 
     // Disable button if data is not suited
     function isButtonDisabled(){
-        if(firstName === '' || hasNumber(firstName) || firstName === ' ' || lastName === '' || hasNumber(lastName) || lastName === ' ' || isDOBValid === false ){
-            return true
-        } else {
-            return false
-        }
+        return firstName === '' || hasNumber(firstName) || firstName === ' ' || lastName === '' || hasNumber(lastName) || lastName === ' ' || hasNumber(DOB) === false;
     }
 
     return (
