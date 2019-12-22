@@ -148,12 +148,28 @@ const TrainingsInputContent = () => {
 
     const handleUpdateDate = () => {
         try{
-            if(hasNumber(trainingData.training.date)){
-                dbRefTraining.update({
-                    date: trainingData.training.date
-                }).then(
-                    dispatch(snackbarOn('Date mis à jour', 'success', new Date()))
-                )
+            let promises = [];
+            if(hasNumber(trainingData.training.date)){ // Check if date format valid
+                promises.push( // Attempt on updating training date
+                    dbRefTraining.update({
+                        date: trainingData.training.date
+                    })
+                );
+                // Attempt on updating training date stored in every players' data
+                for(let playerKey of Object.keys(trainingData.training.playerAttendees)){
+                    promises.push(
+                        dbRefPlayers.child(playerKey).child('trainingsAttended').child(id).update({
+                            date: trainingData.training.date
+                        })
+                    );
+                }
+                Promise.all(promises)
+                    .then( // Output success message if all update done correctly
+                        dispatch(snackbarOn('Date mis à jour', 'success', new Date()))
+                    )
+                    .catch(function (err) { // Output error message if error is caught
+                        dispatch(snackbarOn('Erreur mis à jour date', 'error', new Date()))
+                    })
             } else {
                 dispatch(snackbarOn('Format date invalide', 'error', new Date()))
             }
