@@ -2,6 +2,8 @@ import React, {useState} from 'react'
 import TacticsTable from "./TacticsTable";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Button, makeStyles} from "@material-ui/core";
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../actions";
 import firebase from "firebase";
 import { useHistory } from "react-router-dom";
 
@@ -16,31 +18,42 @@ const useStyles = makeStyles({
 
 const TacticsContent = () => {
     const classes = useStyles();
-    const dbRefTactics = firebase.database().ref('tactics');
     const [tactics, setTactics] = useState({tactics: ''});
+    const db = firebase.firestore();
+    const dispatch = useDispatch();
     let history = useHistory();
 
     const handleNewTactics = () => {
-        dbRefTactics.push({
-            name: 'Sans Nom',
-        }).then((snap) => {
-            const key = snap.key;
+        db.collection('tactics').add({
+            name: 'Sans Nom'
+        }).then(docRef => {
+            const key = docRef.id;
             history.push('/tactics/' + key)
+        }).catch(() => {
+            dispatch(snackbarOn('Erreur: Tactique non crée', 'error', new Date()))
         })
+
     };
 
     const handleRemoveTactics = key => {
-        dbRefTactics.child(key).remove()
-    }
+        db.collection('tactics').doc(key).delete()
+            .then(() => {
+                dispatch(snackbarOn('Tactique supprimée', 'success', new Date()))
+            })
+            .catch(() => {
+                dispatch(snackbarOn('Erreur: Tactique non supprimée', 'error', new Date()))
+            })
+    };
 
     const tacticsHandler = () => {
-        const handleNewTactics = snap => {
-            if (snap.val()) setTactics({tactics: snap.val()});
-        };
-        dbRefTactics.on('value', handleNewTactics);
-        return () => {
-            dbRefTactics.off('value', handleNewTactics);
-        };
+        db.collection('tactics')
+            .onSnapshot(querySnapshot => {
+                let nextState = {};
+                querySnapshot.forEach(doc => {
+                    nextState = {...nextState, [doc.id] : doc.data()}
+                });
+                setTactics({tactics: nextState})
+            });
     };
 
     React.useEffect(() => {

@@ -130,8 +130,19 @@ const PlayerTable = () => {
 
     const db = firebase.firestore();
 
-    const handleRemovePlayer = key => {
-        db.collection('players').doc(key).delete()
+    const handleRemovePlayer = async key => {
+        try{
+            await listPlayers.player[key].trainingsAttended.forEach(trainingId => {
+                db.collection('trainings').doc(trainingId).set({
+                    playerAttendees: {
+                        [key]: firebase.firestore.FieldValue.delete()
+                    }
+                }, {merge: true});
+            });
+        } catch (e) {
+            console.log(e)
+        }
+        await db.collection('players').doc(key).delete()
             .then(
                 dispatch(snackbarOn('Joueur enlevé', 'success', new Date()))
             ).catch(err => {

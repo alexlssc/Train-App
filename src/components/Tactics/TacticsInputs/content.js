@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import TacticsEditTable from "./TacticsEditTable";
-import {makeStyles} from "@material-ui/core";
+import {Button, makeStyles} from "@material-ui/core";
 import firebase from "firebase";
 import { useParams } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
@@ -11,6 +11,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import {useDispatch} from "react-redux";
 import {snackbarOn} from "../../../actions";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 
 const useStyles = makeStyles({
@@ -18,16 +19,19 @@ const useStyles = makeStyles({
         marginTop: 20,
         float: 'right',
     },
+    nameForm: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
     textField: {
-        '& > *': {
-            width: '50%',
-            marginBottom: 10,
-        },
+      width: '40%',
+      marginRight: 10,
     },
     form: {
         width: '100%',
         marginBottom: 10,
-    }
+    },
 });
 
 const TacticsInputContent = () => {
@@ -35,33 +39,43 @@ const TacticsInputContent = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
     const dbRefTactics = firebase.database().ref('tactics').child(id);
-    const [tactic, setTactic] = useState({
-        tactic: {
-            name: ''
-        }
-    });
+    const db = firebase.firestore();
+    const [tactic, setTactic] = useState(null);
     const tacticHandler = () => {
-        const handleNewTactic = snap => {
-            if (snap.val()) setTactic({tactic: snap.val()});
-        };
-        dbRefTactics.on('value', handleNewTactic);
-        return () => {
-            dbRefTactics.off('value', handleNewTactic);
-        };
+        db.collection('tactics').doc(id)
+            .onSnapshot(doc => {
+                setTactic({tactic: doc.data()})
+            });
     };
 
     const handleChangeName = e => {
-        dbRefTactics.update({
-            name: e.target.value
-        }).then(() => {
-            //setStatus({ msg: 'Nom mis à jour', date: new Date(), type: 'success' })
+        try{
+            const attemptValue = e.target.value;
+            setTactic(prevState => ({
+                tactic: {
+                    ...prevState.tactic,
+                    name: attemptValue
+                }
+            }))
+        } catch (e) {
+            console.log('Erreur modification de nom')
+        }
+    };
+
+    const handleUpdateName = () => {
+        db.collection('tactics').doc(id).set({
+            name: tactic.tactic.name
+        }, {merge: true}).then(() => {
             dispatch(snackbarOn('Nom mis à jour', 'success', new Date()));
         })
+            .catch(() => {
+                dispatch(snackbarOn('Erreur: Nom non mis à jour', 'error', new Date()))
+            })
     };
 
     const nbOfPosition = () => {
-        if(typeof tactic.tactic.positions !== 'undefined'){
-            var counter = 0;
+        if(tactic.tactic.positions != null){
+            let counter = 0;
             Object.values(tactic.tactic.positions).map(nb => (
                 counter += nb
             ));
@@ -73,41 +87,70 @@ const TacticsInputContent = () => {
 
     const handleAddPosition = e => {
         const attemptValue = e.target.value;
-        if(nbOfPosition() < 11){ // Make sure there can't be more than 11 positions
-            try { // Executed if position is already in the positions list
+        if(nbOfPosition() < 11){
+            try{
                 const currentValue = tactic.tactic.positions[attemptValue];
-                dbRefTactics.child('positions').update({
-                    [e.target.value]: currentValue + 1
-                }).then(() => {
-                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
-                })
-            } catch (e) { // Executed if position is not already in the position list
-                dbRefTactics.child('positions').update({
-                    [attemptValue]: 1
-                }).then(() => {
-                    dispatch(snackbarOn('Poste ajouté', 'success', new Date()));
-                })
+                if(!isNaN(currentValue)){
+                    db.collection('tactics').doc(id).set({
+                        positions: {
+                            [attemptValue]: currentValue + 1
+                        }
+                    }, {merge: true})
+                        .then(() => {
+                            dispatch(snackbarOn('Poste ajouté', 'success', new Date()))
+                        })
+                } else {
+                    db.collection('tactics').doc(id).set({
+                        positions: {
+                            [attemptValue]: 1
+                        }
+                    }, {merge: true})
+                        .then(() => {
+                            dispatch(snackbarOn('Poste ajouté', 'success', new Date()))
+                        })
+                }
+            }catch (e) {
+                db.collection('tactics').doc(id).set({
+                    positions: {
+                        [attemptValue]: 1
+                    }
+                }, {merge: true})
+                    .then(() => {
+                        dispatch(snackbarOn('Poste ajouté', 'success', new Date()))
+                    })
             }
         } else {
-            dispatch(snackbarOn('Déjà 11 positions', 'warning', new Date()))
+            dispatch(snackbarOn('Déjà 11 postes', 'warning', new Date()))
         }
+
     };
 
     const handleRemovePosition = position => {
-        if(tactic.tactic.positions[position] === 1) {
-            dbRefTactics.child('positions').child(position).remove().then(() => {
-                   // setStatus({ msg: 'Poste enlevé', date: new Date(), type: 'success' })
-                dispatch(snackbarOn('Poste enlevé', 'success', new Date()));
+        const currentPositionValue = tactic.tactic.positions[position]
+        if(currentPositionValue === 1){
+            db.collection('tactics').doc(id).set({
+                positions: {
+                    [position]: firebase.firestore.FieldValue.delete()
                 }
-            );
-        } else{
-            const currentValue = tactic.tactic.positions[position];
-            dbRefTactics.child('positions').update({
-                [position]: currentValue - 1
-            }).then(() => {
-                dispatch(snackbarOn('Poste enlevé', 'success', new Date()));
+            }, {merge: true})
+                .then(() => {
+                    dispatch(snackbarOn('Poste enlevé', 'success', new Date()))
+                })
+                .catch(() => {
+                    dispatch(snackbarOn('Erreur: Poste non enlevé', 'error', new Date()))
+                })
+        } else {
+            db.collection('tactics').doc(id).set({
+                positions: {
+                    [position]: currentPositionValue - 1
                 }
-            )
+            }, {merge: true})
+                .then(() => {
+                    dispatch(snackbarOn('Poste enlevé', 'success', new Date()))
+                })
+                .catch(() => {
+                    dispatch(snackbarOn('Erreur: Poste non enlevé', 'error', new Date()))
+                })
         }
     };
 
@@ -119,8 +162,18 @@ const TacticsInputContent = () => {
 
     return (
         <div>
-            <form className={classes.textField} noValidate autoComplete="off">
-                <TextField id="outlined-basic" label='Nom Formation' value={tactic.tactic.name} variant="outlined" onChange={e => handleChangeName(e)}/>
+            <form className={classes.nameForm} noValidate autoComplete="off">
+                <TextField className={classes.textField} id="outlined-basic" label='Nom Formation' value={tactic != null ? tactic.tactic.name : ''} variant="outlined" onChange={e => handleChangeName(e)}/>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddCircleIcon/>}
+                    className={classes.buttonDate}
+                    //
+                    onClick={() => handleUpdateName()}
+                >
+                    Changer date
+                </Button>
             </form>
             <FormControl variant="outlined" className={classes.form}>
                 <InputLabel id="demo-simple-select-outlined-label">
@@ -138,7 +191,7 @@ const TacticsInputContent = () => {
                     ))}
                 </Select>
             </FormControl>
-            <TacticsEditTable listPositions={tactic.tactic.positions} removePosition={handleRemovePosition}/>
+            <TacticsEditTable listPositions={tactic != null ? tactic.tactic.positions : []} removePosition={handleRemovePosition}/>
         </div>
     )
 }

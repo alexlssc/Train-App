@@ -154,16 +154,22 @@ const TrainingsInputContent = () => {
 
     // Get value from each player training performance and return the average
     const updateOverallPerformance = async() => {
+        let output;
         let trainingDoc = await db.collection('trainings').doc(id).get();
         let allPerformances = Object.keys(trainingDoc.data().playerAttendees).map(playerValues => (
             trainingDoc.data().playerAttendees[playerValues].performance
         ));
-        let sum = allPerformances.reduce((previous, current) => current += previous);
-        let avg = sum / allPerformances.length;
-        return Math.round(avg * 10) / 10;
+        if(allPerformances.length !== 0){
+            let sum = allPerformances.reduce((previous, current) => current += previous);
+            let avg = sum / allPerformances.length;
+            output =  Math.round(avg * 10) / 10;
+        } else {
+            output = 0
+        }
+        return output
     };
 
-    const handleDeletePlayer = key => {
+    const handleDeletePlayer = async key => {
         // Remove player from training's data
         let promises = [];
         promises.push(
@@ -177,12 +183,24 @@ const TrainingsInputContent = () => {
                 trainingsAttended: firebase.firestore.FieldValue.arrayRemove(id)
             })
         );
-        Promise.all(promises)
+        await Promise.all(promises)
             .then(() => {
                 dispatch(snackbarOn('Joueur supprimé', 'success', new Date()))
             }).catch(() => {
                dispatch(snackbarOn('Erreur: Joueur non supprimé', 'error', new Date()))
             })
+;
+        const newOverallPerformance = await updateOverallPerformance();
+
+        try{
+            // Keep track of overall performance
+            db.collection('trainings').doc(id).set({
+                overallPerformance: newOverallPerformance
+            }, {merge: true});
+        } catch (e) {
+            console.log(e)
+        }
+
     };
 
     const handleUpdateDate = () => {
