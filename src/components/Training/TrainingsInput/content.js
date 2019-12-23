@@ -207,7 +207,8 @@ const TrainingsInputContent = () => {
         try{
             if(hasNumber(trainingData.training[id].date)){ // Check if date format valid
                 db.collection('trainings').doc(id).set({
-                    date: trainingData.training[id].date
+                    date: trainingData.training[id].date,
+                    dateStamp: rightFormatDate(trainingData.training[id].date)
                 }, {merge : true})
                     .then(() => {
                         dispatch(snackbarOn('Date mis à jour', 'success', new Date()))

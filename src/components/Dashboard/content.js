@@ -14,46 +14,24 @@ const useStyles = makeStyles(theme => ({
 
 const DashboardContent  = () => {
     const classes = useStyles();
-    const dbRefPlayers = firebase.database().ref('/players');
-
-    const [playersData, setPlayersData] = useState({players: ''});
-    const [loadingFinish, setLoadingFinish] = useState(false);
+    const [weekTrainings, setWeekTrainings] = useState(null);
+    const [allPlayers, setAllPlayers] = useState(null);
+    const [allAvgPerformances, setAllAvgPerformances] = useState(null)
+    const [rankedPerformances, setRankedPerformances] = useState(null);
     const [rankedDone, setRankedDone] = useState(false);
-    const [rankedPerformances, setRankedPerformances] = useState();
-    let allThreeBest = [];
+    const db = firebase.firestore();
+    let allThreeBest = []
 
-    const handleGetPlayers = async () => {
-        const allPlayersSnapshot = await dbRefPlayers.once("value");
+
+    // Format date to dd/MM/yyyy
+    function rightFormatDate(oldDate){
         try{
-            const allPlayersData = allPlayersSnapshot.val();
-            await Promise.all(Object.entries(allPlayersData).map(async ([playerId, playerObject]) => {
-                const playerTrainingDataSnapshot = await dbRefPlayers.child(playerId).child('trainingsAttended').limitToLast(7).once('value');
-                try{
-                    const playerTrainingData = playerTrainingDataSnapshot.val();
-                    const individualPlayerPerformance = Object.values(playerTrainingData).map(singleTrainingData => (
-                        singleTrainingData.performance
-                    ));
-                    setPlayersData(prevState => ({
-                        players: {
-                            ...prevState.players,
-                            [playerId]: {
-                                firstName: playerObject.firstName,
-                                lastName: playerObject.lastName,
-                                positions: playerObject.positions,
-                                performances: individualPlayerPerformance,
-                                avgPerformance: getAverage(individualPlayerPerformance)
-                            }
-                        }
-                    }))
-                } catch (e) {
-                    console.log(e)
-                }
-            }));
-            setLoadingFinish(true)
-        }catch (e) {
-            console.log(e)
+            const dateParts = oldDate.split('/');
+            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        } catch (e) {
+            return null
         }
-    };
+    }
 
     const getAverage = allPerformances => {
         let sum = allPerformances.reduce((previous, current) => current += previous);
@@ -61,45 +39,25 @@ const DashboardContent  = () => {
         return Math.round(avg * 10) / 10;
     };
 
-    const sortPlayerPerPerformance = function(){
-        try {
-           if(loadingFinish === true && rankedDone === false){
-               const playerSorted = Object.keys(playersData.players).sort(function(a,b){return playersData.players[a].avgPerformance - playersData.players[b].avgPerformance}).reverse();
-               setRankedPerformances(playerSorted);
-               setRankedDone(true);
-           }
-           if(loadingFinish === true && rankedDone === true){
-               // Find three best player per position and add it to array
-               for(let position of POSITIONS.POSITION){
-                   allThreeBest.push(sortPlayerPerPositionPerPerformance(position))
-               }
-           }
-        } catch (e) {
-            console.log(e)
+    const handlePreparingIncomingData = () => {
+        if(rankedDone === false){
+            const allAvgPerformances = getAllPerformancesAvg();
+            const playerSorted = Object.keys(allAvgPerformances).sort(function(a,b){return allAvgPerformances[a] - allAvgPerformances[b]}).reverse();
+            setRankedPerformances(playerSorted);
+            setAllAvgPerformances(allAvgPerformances);
+            setRankedDone(true);
+        } else {
+            for(let position of POSITIONS.POSITION){
+                allThreeBest.push(sortPlayerPerPositionPerPerformance(position))
+            }
         }
     };
-
-    const displayBoxes = () => {
-        let output = [];
-        allThreeBest.forEach((oneThreeBest, index) => {
-            if(typeof oneThreeBest[0] !== 'undefined'){ //Display box only if there are players to display
-                output.push(
-                    <BoxBestPlayer
-                    topic={`MEILLEURS ${POSITIONS.POSITION[index]}`}
-                    bestPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[0]] : null}
-                    secondPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[1]] : null}
-                    thirdPlayer={oneThreeBest.length !== 0 ? playersData.players[oneThreeBest[2]] : null}
-                    />)
-            }
-        });
-        return output;
-    }
 
     const sortPlayerPerPositionPerPerformance = targetPosition => {
         let threeBestPlayer = Array(3);
         let count = 0;
         for(let playerId of rankedPerformances){
-            const tempPlayer = playersData.players[playerId];
+            const tempPlayer = allPlayers[playerId];
             if(tempPlayer.positions.includes(targetPosition)){
                 threeBestPlayer[count] = playerId;
                 count++;
@@ -109,28 +67,109 @@ const DashboardContent  = () => {
             }
         }
         return threeBestPlayer;
+    }
+
+    const getAllPerformancesAvg = () => {
+        let nextAllPerformance = {};
+        for(let trainingID in weekTrainings){
+            for(let playerID in weekTrainings[trainingID].playerAttendees){
+                const performance = weekTrainings[trainingID].playerAttendees[playerID].performance;
+                try{
+                    if(!isNaN(nextAllPerformance[playerID])){
+                        const currentAverage = getAverage([nextAllPerformance[playerID], performance])
+                        nextAllPerformance = {...nextAllPerformance, [playerID] : currentAverage}
+                    } else {
+                        nextAllPerformance = {...nextAllPerformance, [playerID] : performance}
+                    }
+                } catch (e) {
+                    nextAllPerformance = {...nextAllPerformance, [playerID] : [performance]}
+                }
+            }
+        }
+
+        return nextAllPerformance;
+
     };
 
+
+    const handleGetTrainings = async() => {
+        const querySnapshot = await db.collection('trainings')
+            .where('dateStamp', '>', rightFormatDate('15/12/2019')).get()
+        try{
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            });
+            setWeekTrainings(nextState)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const handleGetPlayers = async() => {
+        const querySnapshot = await db.collection('players').get();
+        try{
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            })
+            setAllPlayers(nextState)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const displayBoxes = () => {
+        let output = [];
+        console.log(allAvgPerformances, allThreeBest);
+        allThreeBest.forEach((oneThreeBest, index) => {
+            if(typeof oneThreeBest[0] !== 'undefined'){ //Display box only if there are players to display
+                output.push(
+                    <BoxBestPlayer
+                        topic={`MEILLEURS ${POSITIONS.POSITION[index]}`}
+                        bestPlayer={oneThreeBest.length !== 0 ? allPlayers[oneThreeBest[0]] : null}
+                        bestPlayerAvg={oneThreeBest.length !== 0 ? allAvgPerformances[oneThreeBest[0]] : null}
+                        secondPlayer={oneThreeBest.length !== 0 ? allPlayers[oneThreeBest[1]] : null}
+                        secondPlayerAvg={oneThreeBest.length !== 0 ? allAvgPerformances[oneThreeBest[1]] : null}
+                        thirdPlayer={oneThreeBest.length !== 0 ? allPlayers[oneThreeBest[2]] : null}
+                        thirdPlayerAvg={oneThreeBest.length !== 0 ? allAvgPerformances[oneThreeBest[2]] : null}
+                    />)
+            }
+        });
+        return output;
+    }
+
+
+
     React.useEffect(() => {
+        handleGetTrainings();
         handleGetPlayers();
-        // eslint-disable-next-line
-    }, []);
-    return (
-        <div className={classes.root}>
-            {loadingFinish === true ? sortPlayerPerPerformance() : null}
-            <BoxBestPlayer
-                topic='MEILLEURS PERFORMANCES'
-                bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[0]] : null}
-                secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[1]] : null}
-                thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[2]] : null}
-            />
-            <BoxBestPlayer
-                topic='PIRES PERFORMANCES'
-                bestPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 3]] : null}
-                secondPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 2]] : null}
-                thirdPlayer={typeof rankedPerformances !== 'undefined' ? playersData.players[rankedPerformances[rankedPerformances.length - 1]] : null}
-            />
-            {allThreeBest.length !==0 ? displayBoxes() : null}
+    }, [])
+
+    return(
+        <div>
+            {allPlayers != null && weekTrainings != null ? handlePreparingIncomingData() : null}
+            <div className={classes.root}>
+                <BoxBestPlayer
+                    topic='MEILLEURS PERFORMANCES'
+                    bestPlayer={rankedPerformances != null  ? allPlayers[rankedPerformances[0]] : null}
+                    bestPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[0]] : null}
+                    secondPlayer={rankedPerformances != null ? allPlayers[rankedPerformances[1]] : null}
+                    secondPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[1]] : null}
+                    thirdPlayer={rankedPerformances != null ? allPlayers[rankedPerformances[2]] : null}
+                    thirdPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[2]] : null}
+                />
+                <BoxBestPlayer
+                    topic='PIRES PERFORMANCES'
+                    bestPlayer={rankedPerformances != null  ? allPlayers[rankedPerformances[rankedPerformances.length - 3]] : null}
+                    bestPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[rankedPerformances.length - 3]] : null}
+                    secondPlayer={rankedPerformances != null ? allPlayers[rankedPerformances[rankedPerformances.length - 2]] : null}
+                    secondPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[rankedPerformances.length - 2]] : null}
+                    thirdPlayer={rankedPerformances != null ? allPlayers[rankedPerformances[rankedPerformances.length - 1]] : null}
+                    thirdPlayerAvg={rankedPerformances != null ? allAvgPerformances[rankedPerformances[rankedPerformances.length - 1]] : null}
+                />
+                {allThreeBest.length !== 0 ? displayBoxes() : null}
+            </div>
         </div>
     )
 };

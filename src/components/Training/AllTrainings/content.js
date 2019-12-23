@@ -52,6 +52,7 @@ const TrainingContent = () => {
     const handleNewTraining = () => {
         db.collection('trainings').add({
             date: getTodayDate(),
+            dateStamp: new Date(),
             overallPerformance: 0,
         }).then(docRef => {
             const key = docRef.id;
@@ -75,11 +76,13 @@ const TrainingContent = () => {
     };
 
     const handleDeleteTrainings = async key => {
-        // await dbRef.child(key).child('playerAttendees').once('value').then(snap => {
-        //     snap.forEach(item => {
-        //         firebase.database().ref('players').child(item.key).child('trainingsAttended').child(key).remove()
-        //     })
-        // });
+        await Promise.all(
+            Object.keys(trainings.trainings[key].playerAttendees).map(playerAttendee => (
+                db.collection('players').doc(playerAttendee).set({
+                    trainingsAttended: firebase.firestore.FieldValue.arrayRemove(key)
+                }, {merge: true})
+            ))
+        );
 
         await db.collection('trainings').doc(key).delete()
     };
