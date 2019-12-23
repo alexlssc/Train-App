@@ -46,25 +46,31 @@ const TrainingsInputContent = () => {
     const [listPlayers, setListPlayers] = useState({player: ''});
     const [trainingData, setTrainingData] = useState({training: ''});
 
-    const dbRefPlayers = firebase.database().ref('/players');
-    const dbRefTraining = firebase.database().ref('trainings').child(id);
+    const db = firebase.firestore();
     const classes = useStyles();
 
     const listPlayersHandler = () => {
-        const handlePlayers = snap => {
-            if (snap.val()) setListPlayers({player: snap.val()});
-        };
-        dbRefPlayers.once('value', handlePlayers)
+        db.collection('players').get()
+            .then(querySnapshot => {
+                let nextState = {};
+                querySnapshot.forEach(doc => {
+                    nextState = {...nextState, [doc.id] : doc.data()}
+                });
+                setListPlayers(prevState => ({
+                    player: nextState
+                }))
+            });
     };
 
     const trainingHandler = () => {
-        const handleNewTrainings = snap => {
-            if (snap.val()) setTrainingData({training: snap.val()});
-        };
-        dbRefTraining.on('value', handleNewTrainings);
-        return () => {
-            dbRefTraining.off('value', handleNewTrainings);
-        };
+        db.collection('trainings').doc(id)
+            .onSnapshot(doc => {
+                setTrainingData(prevState => ({
+                    training: {
+                        [doc.id]: doc.data()
+                    }
+                }))
+            });
     };
 
 
@@ -75,19 +81,29 @@ const TrainingsInputContent = () => {
     }, []);
 
     function checkIfUserExists(key) {
-        return trainingData.training.playerAttendees[key] != null;
+        try{
+            return trainingData.training[id].playerAttendees[key] != null
+        } catch (e) {
+            return false
+        }
     }
 
     const handleAddAttendee = e => {
         e.preventDefault();
         const playerKey = e.target.value[1];
         if(!checkIfUserExists(playerKey)){
-            dbRefTraining.child('playerAttendees').child(playerKey).set({
-                firstName: e.target.value[0].firstName,
-                lastName: e.target.value[0].lastName,
-                performance: 0
-            }).then(() => {
+            db.collection('trainings').doc(id).set({
+                playerAttendees: {
+                    [playerKey]: {
+                        firstName: e.target.value[0].firstName,
+                        lastName: e.target.value[0].lastName,
+                        performance: 0
+                    },
+                }
+            }, {merge: true}).then(() => {
                 dispatch(snackbarOn('Joueur ajouté', 'success', new Date()));
+            }).catch(() => {
+                dispatch(snackbarOn('Erreur: Joueur non ajouté', 'error', new Date()));
             })
         } else {
             dispatch(snackbarOn('Joueur déjà présent', 'warning', new Date()));
@@ -97,11 +113,15 @@ const TrainingsInputContent = () => {
     const handleAddAllPlayers = () => {
         for(let [playerKey, playerObject] of Object.entries(listPlayers.player)){
             if(!checkIfUserExists(playerKey)){
-                dbRefTraining.child('playerAttendees').child(playerKey).set({
-                    firstName: playerObject.firstName,
-                    lastName: playerObject.lastName,
-                    performance: 0
-                })
+                db.collection('trainings').doc(id).set({
+                    playerAttendees: {
+                        [playerKey]:{
+                            firstName: playerObject.firstName,
+                            lastName: playerObject.lastName,
+                            performance: 0
+                        }
+                    }
+                }, {merge: true})
             }
         }
     };
@@ -109,31 +129,35 @@ const TrainingsInputContent = () => {
 
     // Update player attendee performance and update new overall performance
     const handleUpdatePlayerAttendee = async (key, value) => {
-        await dbRefTraining.child('playerAttendees').child(key).update({
-            performance: value.value
-        });
+        await db.collection('trainings').doc(id).set({
+            playerAttendees: {
+                [key]: {
+                    performance: value.value
+                }
+            }
+        }, {merge: true});
         const newOverallPerformance = await updateOverallPerformance().then(result => {
             return result
         });
 
-        await dbRefTraining.update({
+        // Keep track of overall performance
+        await db.collection('trainings').doc(id).set({
             overallPerformance: newOverallPerformance
-        });
+        }, {merge: true});
 
-        dbRefPlayers.child(key).child('trainingsAttended').child(id).update({
-            performance: value.value,
-            date: trainingData.training.date
-        })
+        // Each players keeps an array of trainings they're attending
+        db.collection('players').doc(key).set({
+            trainingsAttended: firebase.firestore.FieldValue.arrayUnion(id)
+        }, {merge: true});
 
     };
 
     // Get value from each player training performance and return the average
     const updateOverallPerformance = async() => {
-        let allPerformances = await dbRefTraining.child('playerAttendees').once('value').then(snap => {
-            return Object.values(snap.val()).map(playerValues => (
-                playerValues['performance']
-            ));
-        });
+        let trainingDoc = await db.collection('trainings').doc(id).get();
+        let allPerformances = Object.keys(trainingDoc.data().playerAttendees).map(playerValues => (
+            trainingDoc.data().playerAttendees[playerValues].performance
+        ));
         let sum = allPerformances.reduce((previous, current) => current += previous);
         let avg = sum / allPerformances.length;
         return Math.round(avg * 10) / 10;
@@ -141,34 +165,37 @@ const TrainingsInputContent = () => {
 
     const handleDeletePlayer = key => {
         // Remove player from training's data
-        dbRefTraining.child('playerAttendees').child(key).remove();
+        let promises = [];
+        promises.push(
+            db.collection('trainings').doc(id).update({
+                [`playerAttendees.${key}`] : firebase.firestore.FieldValue.delete()
+            })
+        );
         // Remove training from player's data
-        dbRefPlayers.child(key).child('trainingsAttended').child(id).remove();
+        promises.push(
+            db.collection('players').doc(key).update({
+                trainingsAttended: firebase.firestore.FieldValue.arrayRemove(id)
+            })
+        );
+        Promise.all(promises)
+            .then(() => {
+                dispatch(snackbarOn('Joueur supprimé', 'success', new Date()))
+            }).catch(() => {
+               dispatch(snackbarOn('Erreur: Joueur non supprimé', 'error', new Date()))
+            })
     };
 
     const handleUpdateDate = () => {
         try{
-            let promises = [];
-            if(hasNumber(trainingData.training.date)){ // Check if date format valid
-                promises.push( // Attempt on updating training date
-                    dbRefTraining.update({
-                        date: trainingData.training.date
-                    })
-                );
-                // Attempt on updating training date stored in every players' data
-                for(let playerKey of Object.keys(trainingData.training.playerAttendees)){
-                    promises.push(
-                        dbRefPlayers.child(playerKey).child('trainingsAttended').child(id).update({
-                            date: trainingData.training.date
-                        })
-                    );
-                }
-                Promise.all(promises)
-                    .then( // Output success message if all update done correctly
+            if(hasNumber(trainingData.training[id].date)){ // Check if date format valid
+                db.collection('trainings').doc(id).set({
+                    date: trainingData.training[id].date
+                }, {merge : true})
+                    .then(() => {
                         dispatch(snackbarOn('Date mis à jour', 'success', new Date()))
-                    )
-                    .catch(function (err) { // Output error message if error is caught
-                        dispatch(snackbarOn('Erreur mis à jour date', 'error', new Date()))
+                    })
+                    .catch(() => {
+                        dispatch(snackbarOn('Erreur: Date non mis à jour', 'error', new Date()))
                     })
             } else {
                 dispatch(snackbarOn('Format date invalide', 'error', new Date()))
@@ -204,15 +231,17 @@ const TrainingsInputContent = () => {
                         margin="normal"
                         id="date-picker-inline"
                         label="Changer la date"
-                        value={rightFormatDate(trainingData.training.date)}
+                        value={trainingData.training[id] != null ?  rightFormatDate(trainingData.training[id].date) : null}
                         disableFuture='true'
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
                         }}
                         onChange={date => setTrainingData(prevState => ({
                             training:{
-                                ...prevState.training,
-                                date: date != null ? date.toLocaleString().slice(0,10) : ''
+                                [id]: {
+                                    ...prevState.training[id],
+                                    date: date != null ? date.toLocaleString().slice(0,10) : ''
+                                }
                             }
                         }))}
                         autoOk={true}
@@ -251,7 +280,7 @@ const TrainingsInputContent = () => {
             </Paper>
             <br/>
             <TableTraining
-                playerAttendees={typeof trainingData.training.playerAttendees != "undefined" ? trainingData.training.playerAttendees : 'Waiting'}
+                playerAttendees={trainingData.training[id] != null ? trainingData.training[id].playerAttendees : 'Waiting'}
                 updatePlayerAttendee={handleUpdatePlayerAttendee}
                 deletePlayerAttendee={handleDeletePlayer}
             />

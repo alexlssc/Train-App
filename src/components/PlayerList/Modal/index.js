@@ -77,7 +77,7 @@ const TransitionsModal = props => {
     const [positions, setPositions] = React.useState([]);
     const dispatch = useDispatch();
 
-    const db = firebase.database();
+    const db = firebase.firestore();
 
     const handlePosition = e => {
         const attemptValue =  e.target.value;
@@ -124,46 +124,42 @@ const TransitionsModal = props => {
     };
 
     // Add new player to db
-    async function pushNewPlayer(e){
+    function pushNewPlayer(e){
         e.preventDefault();
-        db.ref('players').push({
-                firstName: firstName,
-                lastName: lastName,
-                dob: DOB.toLocaleString().slice(0,10),
-                positions: positions
-            }
-            ,
-            function(error) {
-                if (error)
-                    console.log('Error has occured during saving process');
-                else
-                    handleClear();
-                    props.handleClose();
-            }).then(() => {
-                dispatch(snackbarOn('Joueur ajouté', 'success', new Date()))
-        })
+        db.collection('players').add({
+            firstName: firstName,
+            lastName: lastName,
+            dob: DOB.toLocaleString().slice(0,10),
+            positions: positions
+        }).then(() => {
+            dispatch(snackbarOn('Joueur ajouté', 'success', new Date()));
+            handleClear();
+            props.handleClose();
+        }
+        ).catch(err => {
+            dispatch(snackbarOn('Erreur: ' + err, 'error', new Date()));
+        });
+
+        
     }
 
 
     // Update player in db
-    async function updatePlayer(e){
+    function updatePlayer(e){
         e.preventDefault();
-        db.ref('players').child(props.playerKey).update({
-                firstName: firstName,
-                lastName: lastName,
-                dob: DOB.toLocaleString().slice(0,10),
-                positions: positions
-            }
-            ,
-            function(error) {
-                if (error)
-                    console.log('Error has occured during saving process');
-                else
-                    handleClear();
+        db.collection('players').doc(props.playerKey).update({
+            firstName: firstName,
+            lastName: lastName,
+            dob: DOB.toLocaleString().slice(0,10),
+            positions: positions
+        }).then(() => {
+                dispatch(snackbarOn('Joueur edité', 'success', new Date()));
+                handleClear();
                 props.handleClose();
-            }).then(() => {
-                dispatch(snackbarOn('Joueur mis à jour', 'success', new Date()))
-        })
+            }
+        ).catch(err => {
+            dispatch(snackbarOn('Erreur: ' + err, 'error', new Date()));
+        });
     }
 
     // Clear current state of next use and close

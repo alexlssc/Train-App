@@ -96,7 +96,7 @@ EnhancedTableHead.propTypes = {
 
 const PlayerTable = () => {
     const classes = useStyles();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('lastName');
@@ -128,23 +128,28 @@ const PlayerTable = () => {
         setKeyPlayerEdit('');
     };
 
-    const dbRef = firebase.database().ref('players/');
+    const db = firebase.firestore();
 
     const handleRemovePlayer = key => {
-        dbRef.child(key).remove().then(() => {
-            dispatch(snackbarOn('Joueur enlevé', 'success', new Date()))
-        });
+        db.collection('players').doc(key).delete()
+            .then(
+                dispatch(snackbarOn('Joueur enlevé', 'success', new Date()))
+            ).catch(err => {
+                dispatch(snackbarOn('Erreur: ' + err, 'error', new Date()))
+            })
     };
 
-
     const playerHandler = () => {
-        const handleNewPlayers = snap => {
-            if (snap.val()) setListPlayers({player: snap.val()});
-        };
-        dbRef.on('value', handleNewPlayers);
-        return () => {
-            dbRef.off('value', handleNewPlayers);
-        };
+        db.collection('players')
+            .onSnapshot(querySnapshot => {
+                let nextState = {};
+                querySnapshot.forEach(doc => {
+                    nextState = {...nextState, [doc.id] : doc.data()}
+                });
+                setListPlayers(prevState => ({
+                    player: nextState
+                }))
+            });
     };
 
     React.useEffect(() => {

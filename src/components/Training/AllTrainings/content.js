@@ -5,6 +5,8 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Link} from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import firebase from "firebase";
+import {useDispatch} from "react-redux";
+import {snackbarOn} from "../../../actions";
 
 
 const useStyles = makeStyles({
@@ -17,9 +19,9 @@ const useStyles = makeStyles({
 const TrainingContent = () => {
     const classes = useStyles();
 
-    const [trainings, setTrainings] = useState({trainings: ''})
-
-    const dbRef = firebase.database().ref('trainings');
+    const [trainings, setTrainings] = useState({trainings: ''});
+    const dispatch = useDispatch()
+    const db = firebase.firestore()
     let history = useHistory();
 
     const getTodayDate = () => {
@@ -31,13 +33,14 @@ const TrainingContent = () => {
     };
 
     const trainingsHandler = () => {
-        const handleNewTrainings = snap => {
-            if (snap.val()) setTrainings({trainings: snap.val()});
-        };
-        dbRef.on('value', handleNewTrainings);
-        return () => {
-            dbRef.off('value', handleNewTrainings);
-        };
+        db.collection('trainings')
+            .onSnapshot(querySnapshot => {
+                let nextState = {};
+                querySnapshot.forEach(doc => {
+                    nextState = {...nextState, [doc.id] : doc.data()}
+                });
+                setTrainings({trainings: nextState})
+            });
     };
 
 
@@ -47,13 +50,14 @@ const TrainingContent = () => {
     }, []);
 
     const handleNewTraining = () => {
-        dbRef.push({
+        db.collection('trainings').add({
             date: getTodayDate(),
             overallPerformance: 0,
-            playerAttendees: '',
-        }).then((snap) => {
-            const key = snap.key;
+        }).then(docRef => {
+            const key = docRef.id;
             history.push('/trainings/' + key)
+        }).catch(() => {
+            dispatch(snackbarOn('Erreur creation entrainement', 'error', new Date()))
         })
     };
 
@@ -71,13 +75,13 @@ const TrainingContent = () => {
     };
 
     const handleDeleteTrainings = async key => {
-        await dbRef.child(key).child('playerAttendees').once('value').then(snap => {
-            snap.forEach(item => {
-                firebase.database().ref('players').child(item.key).child('trainingsAttended').child(key).remove()
-            })
-        });
+        // await dbRef.child(key).child('playerAttendees').once('value').then(snap => {
+        //     snap.forEach(item => {
+        //         firebase.database().ref('players').child(item.key).child('trainingsAttended').child(key).remove()
+        //     })
+        // });
 
-        await dbRef.child(key).remove();
+        await db.collection('trainings').doc(key).delete()
     };
 
     return (
