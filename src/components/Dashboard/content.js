@@ -156,6 +156,7 @@ const DashboardContent  = () => {
     return(
         <div>
             {allPlayers != null && weekTrainings != null ? handlePreparingIncomingData() : null}
+            <h1>Meilleurs performances sur les 7 derniers jours</h1>
             <div className={classes.root}>
                 <BoxBestPlayer
                     topic='MEILLEURS PERFORMANCES'

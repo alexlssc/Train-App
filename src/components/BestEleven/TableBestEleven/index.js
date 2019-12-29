@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 
 const TableBestEleven = props => {
     const classes = useStyles();
-    const {selectedTactic, allThreeBest} = props;
+    const {selectedTactic, allThreeBest, allPlayers, allAvgPerformance} = props;
 
     const displayRows = () => {
         let output = [];
@@ -52,13 +52,13 @@ const TableBestEleven = props => {
 
     const displayPlayerRows = arrayOfPlayers => {
         const output = [];
-        for(let playerObject of arrayOfPlayers){
+        for(let playerId of arrayOfPlayers){
             try{
                 output.push(
                     <TableCell align={"right"}>
                         <div className={classes.playerCell}>
-                            <p style={{marginRight: 20}} >{`${playerObject.lastName} ${playerObject.firstName}`}</p>
-                            <ColouredNumber performance={playerObject.avgPerformance}/>
+                            <p style={{marginRight: 20}} >{`${allPlayers[playerId].lastName} ${allPlayers[playerId].firstName}`}</p>
+                            <ColouredNumber performance={allAvgPerformance[playerId]}/>
                         </div>
                     </TableCell>
                 )

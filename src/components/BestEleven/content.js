@@ -25,62 +25,31 @@ const BestElevenContent = () => {
     const dispatch = useDispatch();
     const [allTactics, setAllTactics] = useState(null)
     const [selectedTactic, setSelectedTactic] = useState(null);
-    const [playersData, setPlayersData] = useState({players: ''});
-    const [loadingFinish, setLoadingFinish] = useState(false);
+    const [weekTrainings, setWeekTrainings] = useState(null);
+    const [allPlayers, setAllPlayers] = useState(null);
+    const [allAvgPerformances, setAllAvgPerformances] = useState(null)
+    const [rankedPerformances, setRankedPerformances] = useState(null);
     const [rankedDone, setRankedDone] = useState(false);
-    const [rankedPerformances, setRankedPerformances] = useState();
-
     const db = firebase.firestore();
-    const dbRefPlayers = firebase.database().ref('/players');
-
     let allThreeBest = [];
 
-    const handleGetTactics =  async () => {
-        const querySnapshot = await db.collection('tactics').get();
+    // Format date to dd/MM/yyyy
+    function rightFormatDate(oldDate){
         try{
-            let nextState = {};
-            querySnapshot.forEach(doc => {
-                nextState = {...nextState, [doc.id] : doc.data()}
-            })
-            setAllTactics(nextState)
-            setSelectedTactic(nextState[Object.keys(nextState)[0]])
+            const dateParts = oldDate.split('/');
+            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
         } catch (e) {
-            console.error('Error retrieving tactics')
+            return null
         }
     }
 
-    const handleGetPlayers = async () => {
-        const allPlayersSnapshot = await dbRefPlayers.once("value");
-        try{
-            const allPlayersData = allPlayersSnapshot.val();
-            await Promise.all(Object.entries(allPlayersData).map(async ([playerId, playerObject]) => {
-                const playerTrainingDataSnapshot = await dbRefPlayers.child(playerId).child('trainingsAttended').limitToLast(7).once('value');
-                try{
-                    const playerTrainingData = playerTrainingDataSnapshot.val();
-                    const individualPlayerPerformance = Object.values(playerTrainingData).map(singleTrainingData => (
-                        singleTrainingData.performance
-                    ));
-                    setPlayersData(prevState => ({
-                        players: {
-                            ...prevState.players,
-                            [playerId]: {
-                                firstName: playerObject.firstName,
-                                lastName: playerObject.lastName,
-                                positions: playerObject.positions,
-                                performances: individualPlayerPerformance,
-                                avgPerformance: getAverage(individualPlayerPerformance)
-                            }
-                        }
-                    }))
-                } catch (e) {
-                    console.log(e)
-                }
-            }));
-            setLoadingFinish(true)
-        }catch (e) {
-            console.log(e)
-        }
-    };
+    // return max date in the past to retrieve training
+    const getTargetDate = nbDays => {
+        const currentTimestamp = Date.parse(new Date());
+        const targetTimestamp = currentTimestamp - 8.64e7 * nbDays;
+        console.log(new Date(targetTimestamp).toLocaleString().slice(0, 10));
+        return new Date(targetTimestamp).toLocaleString().slice(0,10);
+    }
 
     const getAverage = allPerformances => {
         let sum = allPerformances.reduce((previous, current) => current += previous);
@@ -88,21 +57,17 @@ const BestElevenContent = () => {
         return Math.round(avg * 10) / 10;
     };
 
-    const sortPlayerPerPerformance = function(){
-        try {
-            if(loadingFinish === true && rankedDone === false){
-                const playerSorted = Object.keys(playersData.players).sort(function(a,b){return playersData.players[a].avgPerformance - playersData.players[b].avgPerformance}).reverse();
-                setRankedPerformances(playerSorted);
-                setRankedDone(true);
+    const handlePreparingIncomingData = () => {
+        if(rankedDone === false){
+            const allAvgPerformances = getAllPerformancesAvg();
+            const playerSorted = Object.keys(allAvgPerformances).sort(function(a,b){return allAvgPerformances[a] - allAvgPerformances[b]}).reverse();
+            setRankedPerformances(playerSorted);
+            setAllAvgPerformances(allAvgPerformances);
+            setRankedDone(true);
+        } else {
+            for(let position of POSITIONS.POSITION){
+                allThreeBest.push(sortPlayerPerPositionPerPerformance(position))
             }
-            if(loadingFinish === true && rankedDone === true){
-                // Find three best player per position and add it to array
-                for(let position of POSITIONS.POSITION){
-                    allThreeBest.push(sortPlayerPerPositionPerPerformance(position))
-                }
-            }
-        } catch (e) {
-            console.log(e)
         }
     };
 
@@ -110,9 +75,9 @@ const BestElevenContent = () => {
         let threeBestPlayer = Array(3);
         let count = 0;
         for(let playerId of rankedPerformances){
-            const tempPlayer = playersData.players[playerId];
+            const tempPlayer = allPlayers[playerId];
             if(tempPlayer.positions.includes(targetPosition)){
-                threeBestPlayer[count] = tempPlayer;
+                threeBestPlayer[count] = playerId;
                 count++;
                 if(count === 3){
                     return threeBestPlayer;
@@ -120,7 +85,71 @@ const BestElevenContent = () => {
             }
         }
         return threeBestPlayer;
+    }
+
+    const getAllPerformancesAvg = () => {
+        let nextAllPerformance = {};
+        for(let trainingID in weekTrainings){
+            for(let playerID in weekTrainings[trainingID].playerAttendees){
+                const performance = weekTrainings[trainingID].playerAttendees[playerID].performance;
+                try{
+                    if(!isNaN(nextAllPerformance[playerID])){
+                        const currentAverage = getAverage([nextAllPerformance[playerID], performance])
+                        nextAllPerformance = {...nextAllPerformance, [playerID] : currentAverage}
+                    } else {
+                        nextAllPerformance = {...nextAllPerformance, [playerID] : performance}
+                    }
+                } catch (e) {
+                    nextAllPerformance = {...nextAllPerformance, [playerID] : [performance]}
+                }
+            }
+        }
+
+        return nextAllPerformance;
+
     };
+
+    const handleGetPlayers = async() => {
+        const querySnapshot = await db.collection('players').get();
+        try{
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            })
+            setAllPlayers(nextState)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const handleGetTrainings = async() => {
+        const querySnapshot = await db.collection('trainings')
+            .where('dateStamp', '>=', rightFormatDate(getTargetDate(7))).get();
+        try{
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            });
+            setWeekTrainings(nextState)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const handleGetTactics =  async () => {
+        const querySnapshot = await db.collection('tactics').get();
+        try{
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            });
+            setAllTactics(nextState)
+            setSelectedTactic(nextState[Object.keys(nextState)[0]])
+        } catch (e) {
+            console.error('Error retrieving tactics')
+        }
+    };
+
     const handleChangeTactic = e => {
         try{
             setSelectedTactic(e.target.value)
@@ -133,13 +162,15 @@ const BestElevenContent = () => {
 
     React.useEffect(() => {
         handleGetTactics();
+        handleGetTrainings()
         handleGetPlayers();
         // eslint-disable-next-line
     }, []);
 
     return (
         <div>
-            {loadingFinish === true ? sortPlayerPerPerformance() : null}
+            {allPlayers != null && weekTrainings != null ? handlePreparingIncomingData() : null}
+            <h1>Meilleurs performances sur les 7 derniers jours</h1>
             <Paper>
                 <FormControl variant="outlined" className={classes.form}>
                     <InputLabel id="demo-simple-select-outlined-label">
@@ -158,6 +189,8 @@ const BestElevenContent = () => {
             <TableBestEleven
                 selectedTactic={selectedTactic !== null ? selectedTactic : null}
                 allThreeBest={allThreeBest.length !== 0 ? allThreeBest : null}
+                allPlayers={allPlayers != null ? allPlayers : null}
+                allAvgPerformance={allAvgPerformances != null ? allAvgPerformances : null}
             />
         </div>
     )
