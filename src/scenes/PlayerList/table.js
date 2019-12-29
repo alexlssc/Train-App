@@ -80,7 +80,6 @@ function EnhancedTableHead(props) {
                         ) : null}
                     </TableSortLabel>
                 </TableCell>
-                {/*<TableCell key='dob' align={"right"}>Age</TableCell>*/}
                 <TableCell key='dob' sortDirection={orderBy ===  'dob' ? order : false} align={"right"}>
                     <TableSortLabel
                         active={orderBy === 'dob'}

@@ -7,7 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import {makeStyles} from "@material-ui/core";
 import * as POSITIONS from '../../../constants/positions';
-import ColouredNumber from "../../ColouredNumber";
+import ColouredNumber from "../../../components/ColouredNumber";
 
 const useStyles = makeStyles({
     root: {

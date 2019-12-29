@@ -172,7 +172,7 @@ const TacticsInputContent = () => {
                     //
                     onClick={() => handleUpdateName()}
                 >
-                    Changer date
+                    Changer nom
                 </Button>
             </form>
             <FormControl variant="outlined" className={classes.form}>

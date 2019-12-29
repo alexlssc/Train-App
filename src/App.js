@@ -4,13 +4,14 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import * as ROUTES from './constants/routes';
 import SignInPage from './components/SignIn'
-import MainPage from "./components/Dashboard";
-import PlayerList from './components/PlayerList';
-import TrainPage from './components/Training/AllTrainings';
-import TrainingsInputContent from "./components/Training/TrainingsInput/";
-import TacticsPage from "./components/Tactics"
-import TacticsInput from "./components/Tactics/TacticsInputs";
-import BestEleven from "./components/BestEleven";
+import MainPage from "./scenes/Dashboard";
+import PlayerList from './scenes/PlayerList';
+import TrainPage from './scenes/Training/AllTrainings';
+import TrainingsInputContent from "./scenes/Training/TrainingsInput/";
+import TacticsPage from "./scenes/Tactics"
+import TacticsInput from "./scenes/Tactics/TacticsInputs";
+import BestEleven from "./scenes/BestEleven";
+import GameRecords from "./scenes/TacticComparator/GameRecords";
 import { withAuthentication } from './components/Session';
 import CustomisedSnackBar from "./components/SnackBarContent";
 import {useSelector, useDispatch} from "react-redux";
@@ -31,6 +32,7 @@ const App = () => {
                     <Route path={ROUTES.TACTICS} exact component={TacticsPage}/>
                     <Route path={ROUTES.INPUTTACTICS} component={TacticsInput}/>
                     <Route path={ROUTES.BESTELEVEN} component={BestEleven}/>
+                    <Route path={ROUTES.GAMERECORDS} component={GameRecords}/>
                 </Switch>
             </Router>
             {snackbarState.status ? <CustomisedSnackBar variant={snackbarState.status.category} open={snackbarState.status !== null} onClose={() => dispatch(snackbarOff())} message={snackbarState.status.msg} /> : null}

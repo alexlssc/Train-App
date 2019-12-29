@@ -19,7 +19,7 @@ import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import SignOutButton from '../SignOut';
+import SignOutButton from '../../components/SignOut';
 import * as ROUTES from "../../constants/routes";
 
 const drawerWidth = 240;
@@ -90,6 +90,10 @@ function ResponsiveDrawer(props) {
                 <ListItem button component={Link} to={ROUTES.BESTELEVEN} key="listPlayer">
                     <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Meilleur 11"/>
+                </ListItem>
+                <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="listPlayer">
+                    <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
+                    <ListItemText primary="Comparateur Tactique"/>
                 </ListItem>
             </List>
             <Divider />

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import BoxBestPlayer from "../BoxBestPlayers";
+import BoxBestPlayer from "../../components/BoxBestPlayers";
 import {makeStyles} from "@material-ui/styles";
 import firebase from "firebase";
 import * as POSITIONS from '../../constants/positions'

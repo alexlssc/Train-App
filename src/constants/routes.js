@@ -6,3 +6,4 @@ export const INPUTTRAININGS = '/trainings/:id';
 export const TACTICS = '/tactics';
 export const INPUTTACTICS = '/tactics/:id';
 export const BESTELEVEN = '/best-eleven';
+export const GAMERECORDS = '/game-records';
