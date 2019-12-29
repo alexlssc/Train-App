@@ -20,8 +20,8 @@ const TrainingContent = () => {
     const classes = useStyles();
 
     const [trainings, setTrainings] = useState({trainings: ''});
-    const dispatch = useDispatch()
-    const db = firebase.firestore()
+    const dispatch = useDispatch();
+    const db = firebase.firestore();
     let history = useHistory();
 
     const getTodayDate = () => {
@@ -32,8 +32,27 @@ const TrainingContent = () => {
         return dd + '/' + mm + '/' + yyyy;
     };
 
+    // return max date in the past to retrieve training
+    const getTargetDate = nbDays => {
+        const currentTimestamp = Date.parse(new Date());
+        const targetTimestamp = currentTimestamp - 8.64e7 * nbDays;
+        console.log(new Date(targetTimestamp).toLocaleString().slice(0, 10));
+        return new Date(targetTimestamp).toLocaleString().slice(0,10);
+    }
+
+    // Format date to dd/MM/yyyy
+    function rightFormatDate(oldDate){
+        try{
+            const dateParts = oldDate.split('/');
+            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        } catch (e) {
+            return null
+        }
+    }
+
     const trainingsHandler = () => {
         db.collection('trainings')
+            .where('dateStamp', '>=', rightFormatDate(getTargetDate(7)))
             .onSnapshot(querySnapshot => {
                 let nextState = {};
                 querySnapshot.forEach(doc => {
@@ -44,10 +63,7 @@ const TrainingContent = () => {
     };
 
 
-    React.useEffect(() => {
-        trainingsHandler();
-        // eslint-disable-next-line
-    }, []);
+
 
     const handleNewTraining = () => {
         db.collection('trainings').add({
@@ -87,10 +103,16 @@ const TrainingContent = () => {
         await db.collection('trainings').doc(key).delete()
     };
 
+
+    React.useEffect(() => {
+        trainingsHandler();
+        // eslint-disable-next-line
+    }, []);
+
+
     return (
         <div>
-            <h1>Entraînement</h1>
-            <h2>Entraînement cette semaine</h2>
+            <h1>Entraînement ces 7 derniers jours</h1>
             <WeekTrainingTable trainings={trainings.trainings} editHandler={handleEditTrainings} deleteHandler={handleDeleteTrainings}/>
             <Button
                 variant="contained"
