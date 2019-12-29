@@ -80,7 +80,21 @@ function EnhancedTableHead(props) {
                         ) : null}
                     </TableSortLabel>
                 </TableCell>
-                <TableCell key='dob' align={"right"}>Age</TableCell>
+                {/*<TableCell key='dob' align={"right"}>Age</TableCell>*/}
+                <TableCell key='dob' sortDirection={orderBy ===  'dob' ? order : false} align={"right"}>
+                    <TableSortLabel
+                        active={orderBy === 'dob'}
+                        direction={order}
+                        onClick={createSortHandler('dob')}
+                    >
+                        {'Age'}
+                        {orderBy === 'firstName' ? (
+                            <span className={classes.visuallyHidden}>
+                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                            </span>
+                        ) : null}
+                    </TableSortLabel>
+                </TableCell>
                 <TableCell key='positions' align={"right"}>Positions</TableCell>
             </TableRow>
         </TableHead>
@@ -184,7 +198,21 @@ const PlayerTable = () => {
                     <EnhancedTableHead classes={classes} onRequestSort={handleRequestSort}  order={order} orderBy={orderBy}/>
                     <TableBody>
                         {Object.entries(listPlayers.player).sort(
-                            (a,b) => a[1]['lastName'].localeCompare(b[1]['lastName'])
+                            (a,b) => {
+                                if(order === 'asc'){
+                                    if(orderBy !== 'dob'){
+                                        return a[1][orderBy].localeCompare(b[1][orderBy])
+                                    } else {
+                                        return _calculateAge(a[1][orderBy]) - _calculateAge(b[1][orderBy])
+                                    }
+                                } else {
+                                    if(orderBy !== 'dob'){
+                                        return b[1][orderBy].localeCompare(a[1][orderBy])
+                                    } else {
+                                        return _calculateAge(b[1][orderBy]) - _calculateAge(a[1][orderBy])
+                                    }
+                                }
+                            }
                         ).map(([key, playerObject]) => (
                             <TableRow key={key}>
                                 <TableCell >{playerObject["lastName"]}</TableCell>
