@@ -23,31 +23,31 @@ const useStyles = makeStyles({
 const BestElevenContent = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const [allTactics, setAllTactics] = useState(null)
     const [selectedTactic, setSelectedTactic] = useState(null);
     const [playersData, setPlayersData] = useState({players: ''});
-    const [allTactics, setAllTactics] = useState(null)
     const [loadingFinish, setLoadingFinish] = useState(false);
     const [rankedDone, setRankedDone] = useState(false);
     const [rankedPerformances, setRankedPerformances] = useState();
 
-    const dbRefTactic = firebase.database().ref('tactics');
+    const db = firebase.firestore();
     const dbRefPlayers = firebase.database().ref('/players');
 
     let allThreeBest = [];
 
-    const handleGetTactics = async() => {
-        const tacticSnapshot = await dbRefTactic.once('value');
+    const handleGetTactics =  async () => {
+        const querySnapshot = await db.collection('tactics').get();
         try{
-            const tacticsData = tacticSnapshot.val();
-            setAllTactics(tacticsData);
-            // Set first tactic as default
-            setSelectedTactic(tacticsData[Object.keys(tacticsData)[0]])
-
-        }catch (e) {
-            console.log("Can't extract data from database");
+            let nextState = {};
+            querySnapshot.forEach(doc => {
+                nextState = {...nextState, [doc.id] : doc.data()}
+            })
+            setAllTactics(nextState)
+            setSelectedTactic(nextState[Object.keys(nextState)[0]])
+        } catch (e) {
+            console.error('Error retrieving tactics')
         }
-
-    };
+    }
 
     const handleGetPlayers = async () => {
         const allPlayersSnapshot = await dbRefPlayers.once("value");

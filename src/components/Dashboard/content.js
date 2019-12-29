@@ -20,7 +20,7 @@ const DashboardContent  = () => {
     const [rankedPerformances, setRankedPerformances] = useState(null);
     const [rankedDone, setRankedDone] = useState(false);
     const db = firebase.firestore();
-    let allThreeBest = []
+    let allThreeBest = [];
 
 
     // Format date to dd/MM/yyyy
@@ -31,6 +31,14 @@ const DashboardContent  = () => {
         } catch (e) {
             return null
         }
+    }
+
+    // return max date in the past to retrieve training
+    const getTargetDate = nbDays => {
+        const currentTimestamp = Date.parse(new Date());
+        const targetTimestamp = currentTimestamp - 8.64e7 * nbDays;
+        console.log(new Date(targetTimestamp).toLocaleString().slice(0, 10));
+        return new Date(targetTimestamp).toLocaleString().slice(0,10);
     }
 
     const getAverage = allPerformances => {
@@ -94,7 +102,7 @@ const DashboardContent  = () => {
 
     const handleGetTrainings = async() => {
         const querySnapshot = await db.collection('trainings')
-            .where('dateStamp', '>', rightFormatDate('15/12/2019')).get()
+            .where('dateStamp', '>=', rightFormatDate(getTargetDate(7))).get();
         try{
             let nextState = {};
             querySnapshot.forEach(doc => {
@@ -121,7 +129,6 @@ const DashboardContent  = () => {
 
     const displayBoxes = () => {
         let output = [];
-        console.log(allAvgPerformances, allThreeBest);
         allThreeBest.forEach((oneThreeBest, index) => {
             if(typeof oneThreeBest[0] !== 'undefined'){ //Display box only if there are players to display
                 output.push(
@@ -137,7 +144,7 @@ const DashboardContent  = () => {
             }
         });
         return output;
-    }
+    };
 
 
 
