@@ -7,4 +7,4 @@ export const TACTICS = '/tactics';
 export const INPUTTACTICS = '/tactics/:id';
 export const BESTELEVEN = '/best-eleven';
 export const GAMERECORDS = '/game-records';
-export const INPUTGAMERECORDS = '/new-game-record';
+export const INPUTGAMERECORDS = '/new-game-record/:id';
