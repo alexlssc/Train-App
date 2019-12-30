@@ -10,8 +10,6 @@ import * as POSITIONS from '../../../../../constants/positions'
 import ListItem from '@material-ui/core/ListItem';
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/core/SvgIcon/SvgIcon";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -19,7 +17,13 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'space-between',
         padding: 7
+    },
+    upperCard: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
     },
     logo: {
         width: 100,
@@ -37,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TeamTacticDisplay = props => {
-    const { allTactics, opponentCard , handleChangeSelectedTactic, targetTeam, targetTeamSelectedTactic,} = props;
+    const { allTactics, allClubs ,opponentCard , handleChangeSelectedTactic, handleChangeOpponent, targetTeam, targetTeamSelectedTactic} = props;
     const classes = useStyles();
 
     const getMenuContent = () => {
@@ -72,10 +76,41 @@ const TeamTacticDisplay = props => {
         return output;
     };
 
+    const allClubMenu = () => {
+        return(
+            <FormControl variant="outlined" className={classes.form}>
+                <InputLabel id="demo-simple-select-outlined-label">
+                    Choisir adversaire
+                </InputLabel>
+                <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="playerList"
+                    value={targetTeam != null ? targetTeam.name : ''}
+                    className={classes.select}
+                    onChange={e => handleChangeOpponent(e)}
+                >
+                    {getClubMenuList()}
+                </Select>
+            </FormControl>
+        )
+    };
+
+    const getClubMenuList = () => {
+        if(allClubs != null){
+            return Object.entries(allClubs).map(([key, clubObject]) => (
+                <MenuItem key={key} value={key}>{clubObject.name}</MenuItem>
+            ))
+        }
+    }
+
     return (
         <Paper className={classes.root}>
-            <img className={classes.logo} src={targetTeam.logo} alt="Team Logo"/>
-            <h2>{targetTeam.name}</h2>
+            <div className={classes.upperCard}>
+                {targetTeam != null ? <img className={classes.logo} src={targetTeam.logo} alt="Team Logo"/> : null}
+                {targetTeam != null ? <h2>{targetTeam.name}</h2> : <h2>NaN</h2>}
+            </div>
+            {opponentCard === true ? allClubMenu() : null}
+            <br/>
             <FormControl variant="outlined" className={classes.form}>
                 <InputLabel id="demo-simple-select-outlined-label">
                     Choisir la formation

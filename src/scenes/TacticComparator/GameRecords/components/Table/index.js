@@ -36,7 +36,7 @@ const TacticComparatorTable = props => {
             const output = Object.entries(gameRecords).map(([key, object]) => (
                 <TableRow key={key}>
                     <TableCell>{object.date}</TableCell>
-                    <TableCell align={"right"}>{object.opponent}</TableCell>
+                    <TableCell align={"right"}>{object.opponent.name}</TableCell>
                     <TableCell align={"right"}>{allTactics[object.ownTactic] != null ? allTactics[object.ownTactic].name : 'NaN'}</TableCell>
                     <TableCell align={"right"}>{allTactics[object.opponentTactic] != null ? allTactics[object.opponentTactic].name : 'NaN'}</TableCell>
                     <TableCell align={"right"}><ColouredScore goalScored={object.goalScored} goalConceded={object.goalConceded}/></TableCell>

@@ -21,6 +21,7 @@ const InputGameRecords = () => {
     const [allTactics, setAllTactics] = React.useState(null);
     const [ownSelectedTactic, setOwnSelectedTactic] = React.useState(null);
     const [opponentSelectedTactic, setOpponentSelectedTactic] = React.useState(null);
+    const [opponentTeam, setOpponentTeam] = React.useState(null)
     const [isLoaded, setIsLoaded] = React.useState(false)
     const dispatch = useDispatch();
     const db = firebase.firestore();
@@ -33,6 +34,10 @@ const InputGameRecords = () => {
             }
             if(gameRecord.opponentTactic != null){
                 setOpponentSelectedTactic(gameRecord.opponentTactic)
+            }
+
+            if(gameRecord.opponent != null){
+                setOpponentTeam(clubData[gameRecord.opponent.id])
             }
             setIsLoaded(true);
         }
@@ -57,6 +62,23 @@ const InputGameRecords = () => {
             })
     };
 
+    const handleChangeOpponent = event => {
+        const tempValue = event.target.value;
+        db.collection('gameRecords').doc(id).set({
+           opponent: {
+               id: tempValue,
+               name: clubData[tempValue].name
+           }
+        }, {merge: true})
+            .then(() => {
+                setOpponentTeam(clubData[tempValue]);
+                dispatch(snackbarOn('Adversaire modifié', 'success', new Date()))
+            })
+            .catch(() => {
+                dispatch(snackbarOn('Erreur: Adversaire non modifié', 'error', new Date()))
+            })
+    };
+
     const handleChangeSelectedTactic = (event, opponentCard) => {
         try{
             const targetTactic = event.target.value;
@@ -65,7 +87,7 @@ const InputGameRecords = () => {
                     ownTactic: targetTactic
                 }, {merge: true})
                     .then(() => {
-                        setOwnSelectedTactic(targetTactic)
+                        setOwnSelectedTactic(targetTactic);
                         dispatch(snackbarOn('Tactique modifié', 'success', new Date()))
                     })
                     .catch(() => {
@@ -73,10 +95,10 @@ const InputGameRecords = () => {
                     })
             } else {
                 db.collection('gameRecords').doc(id).set({
-                    oppponentTactic: targetTactic
+                    opponentTactic: targetTactic
                 }, {merge: true})
                     .then(() => {
-                        setOwnSelectedTactic(targetTactic)
+                        setOpponentSelectedTactic(targetTactic)
                         dispatch(snackbarOn('Tactique modifié', 'success', new Date()))
                     })
                     .catch(() => {
@@ -106,9 +128,11 @@ const InputGameRecords = () => {
             />
             <TeamTacticDisplay
                 allTactics={allTactics}
+                allClubs={clubData}
                 opponentCard={true}
                 handleChangeSelectedTactic={handleChangeSelectedTactic}
-                targetTeam={clubData["10"]}
+                handleChangeOpponent={handleChangeOpponent}
+                targetTeam={opponentTeam}
                 targetTeamSelectedTactic={opponentSelectedTactic}
             />
         </div>
