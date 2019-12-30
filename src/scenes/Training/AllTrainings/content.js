@@ -38,7 +38,7 @@ const TrainingContent = () => {
         const targetTimestamp = currentTimestamp - 8.64e7 * nbDays;
         console.log(new Date(targetTimestamp).toLocaleString().slice(0, 10));
         return new Date(targetTimestamp).toLocaleString().slice(0,10);
-    }
+    };
 
     // Format date to dd/MM/yyyy
     function rightFormatDate(oldDate){

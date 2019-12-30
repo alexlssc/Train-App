@@ -4,9 +4,15 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import TableBody from "@material-ui/core/TableBody";
 import Paper from "@material-ui/core/Paper";
 import PropTypes from "prop-types";
 import Table from "@material-ui/core/Table";
+import {Link} from "react-router-dom";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from '@material-ui/icons/Delete'
+import EditIcon from '@material-ui/icons/Edit';
+import ColouredScore from "../../../../../components/ColouredScore";
 
 
 const useStyles = makeStyles({
@@ -15,7 +21,7 @@ const useStyles = makeStyles({
 
 const TacticComparatorTable = props => {
     const classes = useStyles();
-
+    const {gameRecords, deleteHandler} = props;
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('lastName');
 
@@ -25,11 +31,44 @@ const TacticComparatorTable = props => {
         setOrderBy(property);
     };
 
+    const displayRows = () => {
+        if(gameRecords != null){
+            const output = Object.entries(gameRecords).map(([key, object]) => (
+                <TableRow key={key}>
+                    <TableCell>{object.date}</TableCell>
+                    <TableCell align={"right"}>{object.opponent}</TableCell>
+                    <TableCell align={"right"}>{object.ownTactic}</TableCell>
+                    <TableCell align={"right"}>{object.opponentTactic}</TableCell>
+                    <TableCell align={"right"}><ColouredScore goalScored={object.goalScored} goalConceded={object.goalConceded}/></TableCell>
+                    <TableCell align={'right'} style={{width: 50}}>
+                        <Link
+                            to={'/new-game-record/' + key}
+                        >
+                            <IconButton aria-label="edit">
+                                <EditIcon />
+                            </IconButton>
+                        </Link>
+                    </TableCell>
+                    <TableCell align={'right'} style={{width: 50}}>
+                        <IconButton aria-label="delete" onClick={() => { if (window.confirm('Voulez-vous vraiment supprimer ce match?')) deleteHandler(key)}} >
+                            <DeleteIcon />
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
+
+            ))
+            return output
+        }
+    }
+
 
     return (
         <Paper>
             <Table className={classes.table} aria-label="tactic comparator table">
                 <EnhancedTableHead classes={classes} onRequestSort={handleRequestSort}  order={order} orderBy={orderBy}/>
+                <TableBody>
+                    {displayRows()}
+                </TableBody>
             </Table>
         </Paper>
     );
@@ -104,14 +143,13 @@ const TacticComparatorTable = props => {
                 </TableRow>
             </TableHead>
         );
+
     }
 
-    EnhancedTableHead.propTypes = {
-        classes: PropTypes.object.isRequired,
-        onRequestSort: PropTypes.func.isRequired,
-        order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-        orderBy: PropTypes.string.isRequired,
-    };
+};
+
+TacticComparatorTable.propTypes = {
+    gameRecord: PropTypes.object.isRequired
 };
 
 export default TacticComparatorTable;
