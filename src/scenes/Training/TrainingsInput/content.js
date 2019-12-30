@@ -286,7 +286,7 @@ const TrainingsInputContent = () => {
                     </InputLabel>
                     <Select
                         labelId="demo-simple-select-outlined-label"
-                        id="demo-simple-select-outlined"
+                        id="playerList"
                         value={''}
                         onChange={handleAddAttendee}
                     >

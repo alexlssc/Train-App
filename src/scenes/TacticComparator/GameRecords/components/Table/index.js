@@ -21,7 +21,7 @@ const useStyles = makeStyles({
 
 const TacticComparatorTable = props => {
     const classes = useStyles();
-    const {gameRecords, deleteHandler} = props;
+    const {gameRecords, deleteHandler, allTactics} = props;
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('lastName');
 
@@ -32,13 +32,13 @@ const TacticComparatorTable = props => {
     };
 
     const displayRows = () => {
-        if(gameRecords != null){
+        if(gameRecords != null && allTactics != null){
             const output = Object.entries(gameRecords).map(([key, object]) => (
                 <TableRow key={key}>
                     <TableCell>{object.date}</TableCell>
                     <TableCell align={"right"}>{object.opponent}</TableCell>
-                    <TableCell align={"right"}>{object.ownTactic}</TableCell>
-                    <TableCell align={"right"}>{object.opponentTactic}</TableCell>
+                    <TableCell align={"right"}>{allTactics[object.ownTactic] != null ? allTactics[object.ownTactic].name : 'NaN'}</TableCell>
+                    <TableCell align={"right"}>{allTactics[object.opponentTactic] != null ? allTactics[object.opponentTactic].name : 'NaN'}</TableCell>
                     <TableCell align={"right"}><ColouredScore goalScored={object.goalScored} goalConceded={object.goalConceded}/></TableCell>
                     <TableCell align={'right'} style={{width: 50}}>
                         <Link

@@ -18,6 +18,7 @@ const useStyle = makeStyles({
 const GameRecords = () => {
     const classes = useStyle();
     const [gameRecords, setGameRecords] = useState(null);
+    const [allTactics, setAllTactics] = useState(null);
     let history = useHistory();
     const db = firebase.firestore();
     const dispatch = useDispatch();
@@ -41,13 +42,26 @@ const GameRecords = () => {
             });
     };
 
+    // Game record purely scores id of own tactic and opponent tactic
+    // Tactic collection is pulled to get all the information for the needed tactics
+    const tacticsHandler = () => {
+        db.collection('tactics')
+            .onSnapshot(querySnapshot => {
+                let nextState = {};
+                querySnapshot.forEach(doc => {
+                    nextState = {...nextState, [doc.id] : doc.data()}
+                });
+                setAllTactics(nextState)
+            });
+    };
+
     const handleNewGameRecord = () => {
         db.collection('gameRecords').add({
             date: getTodayDate(),
             dateStamp: new Date(),
-            opponent: 'NaN',
-            ownTactic: 'NaN',
-            opponentTactic: 'NaN',
+            opponent: null,
+            ownTactic: null,
+            opponentTactic: null,
             goalScored: 0,
             goalConceded: 0,
         }).then(docRef => {
@@ -70,12 +84,17 @@ const GameRecords = () => {
 
     React.useEffect(() => {
         gameRecordsHandler();
+        tacticsHandler();
         // eslint-disable-next-line
-    }, [])
+    }, []);
 
     return (
         <React.Fragment>
-            <TacticComparatorTable gameRecords={gameRecords} deleteHandler={handleDeleteGameRecord}/>
+            <TacticComparatorTable
+                gameRecords={gameRecords}
+                deleteHandler={handleDeleteGameRecord}
+                allTactics={allTactics}
+            />
             <Button
                 variant="contained"
                 color="primary"
