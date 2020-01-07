@@ -14,6 +14,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Button} from "@material-ui/core";
 import DateFnsUtils from "@date-io/date-fns";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DatePicker from "../../../components/DatePicker";
 
 const useStyles = makeStyles({
     root: {
@@ -239,45 +240,23 @@ const TrainingsInputContent = () => {
         return /\d/.test(myString);
     }
 
-    return (
-        <div>
-            <div className={classes.dateContainer}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <KeyboardDatePicker
-                        disableToolbar
-                        variant="inline"
-                        format="dd/MM/yyyy"
-                        margin="normal"
-                        id="date-picker-inline"
-                        label="Changer la date"
-                        value={trainingData.training[id] != null ?  rightFormatDate(trainingData.training[id].date) : null}
-                        disableFuture='true'
-                        KeyboardButtonProps={{
-                            'aria-label': 'change date',
-                        }}
-                        onChange={date => setTrainingData(prevState => ({
-                            training:{
-                                [id]: {
-                                    ...prevState.training[id],
-                                    date: date != null ? date.toLocaleString().slice(0,10) : ''
-                                }
-                            }
-                        }))}
-                        autoOk={true}
-                    />
-                </MuiPickersUtilsProvider>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddCircleIcon/>}
-                    className={classes.buttonDate}
-                    //
-                    onClick={() => handleUpdateDate()}
-                >
-                    Changer date
-                </Button>
+    const handleDateOnChange = date => {
+        setTrainingData(prevState => ({
+            training:{
+                [id]: {
+                    ...prevState.training[id],
+                    date: date != null ? date.toLocaleString().slice(0,10) : ''
+                }
+            }}));
+    };
 
-            </div>
+    return (
+        <React.Fragment>
+            <DatePicker
+                datePickerPropsValue={trainingData.training[id] != null ?  trainingData.training[id].date : null}
+                datePickerOnChange={handleDateOnChange}
+                datePickerOnClick={handleUpdateDate}
+            />
             <h1>Ajouter un entraînement</h1>
             <Paper>
                 <FormControl variant="outlined" className={classes.form}>
@@ -313,7 +292,7 @@ const TrainingsInputContent = () => {
             >
                  Ajouter tous les joueurs
             </Button>
-        </div>
+        </React.Fragment>
     )
 };
 

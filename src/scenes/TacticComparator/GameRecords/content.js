@@ -7,6 +7,7 @@ import { useHistory } from "react-router-dom";
 import firebase from "firebase";
 import {useDispatch} from "react-redux";
 import {snackbarOn} from "../../../actions";
+import DatePicker from "../../../components/DatePicker";
 
 const useStyle = makeStyles({
     button: {

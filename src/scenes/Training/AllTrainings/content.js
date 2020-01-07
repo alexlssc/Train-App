@@ -36,7 +36,6 @@ const TrainingContent = () => {
     const getTargetDate = nbDays => {
         const currentTimestamp = Date.parse(new Date());
         const targetTimestamp = currentTimestamp - 8.64e7 * nbDays;
-        console.log(new Date(targetTimestamp).toLocaleString().slice(0, 10));
         return new Date(targetTimestamp).toLocaleString().slice(0,10);
     };
 

@@ -16,7 +16,24 @@ import ColouredScore from "../../../../../components/ColouredScore";
 
 
 const useStyles = makeStyles({
-
+    root: {
+        width: '100%',
+        overflowX: 'auto',
+    },
+    table: {
+        minWidth: 650,
+    },
+    visuallyHidden: {
+        border: 0,
+        clip: 'rect(0 0 0 0)',
+        height: 1,
+        margin: -1,
+        overflow: 'hidden',
+        padding: 0,
+        position: 'absolute',
+        top: 20,
+        width: 1,
+    },
 });
 
 const TacticComparatorTable = props => {
@@ -36,7 +53,7 @@ const TacticComparatorTable = props => {
             const output = Object.entries(gameRecords).map(([key, object]) => (
                 <TableRow key={key}>
                     <TableCell>{object.date}</TableCell>
-                    <TableCell align={"right"}>{object.opponent.name}</TableCell>
+                    <TableCell align={"right"}>{object.opponent != null ? object.opponent.name : 'NaN'}</TableCell>
                     <TableCell align={"right"}>{allTactics[object.ownTactic] != null ? allTactics[object.ownTactic].name : 'NaN'}</TableCell>
                     <TableCell align={"right"}>{allTactics[object.opponentTactic] != null ? allTactics[object.opponentTactic].name : 'NaN'}</TableCell>
                     <TableCell align={"right"}><ColouredScore goalScored={object.goalScored} goalConceded={object.goalConceded}/></TableCell>
@@ -56,10 +73,10 @@ const TacticComparatorTable = props => {
                     </TableCell>
                 </TableRow>
 
-            ))
+            ));
             return output
         }
-    }
+    };
 
 
     return (

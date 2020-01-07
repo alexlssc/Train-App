@@ -38,7 +38,6 @@ const TacticsInputContent = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { id } = useParams();
-    const dbRefTactics = firebase.database().ref('tactics').child(id);
     const db = firebase.firestore();
     const [tactic, setTactic] = useState(null);
     const tacticHandler = () => {

@@ -8,8 +8,6 @@ import {Paper} from "material-ui";
 import List from '@material-ui/core/List';
 import * as POSITIONS from '../../../../../constants/positions'
 import ListItem from '@material-ui/core/ListItem';
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
 
 const useStyles = makeStyles(theme => ({
     root: {

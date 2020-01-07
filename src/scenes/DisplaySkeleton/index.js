@@ -79,19 +79,19 @@ function ResponsiveDrawer(props) {
                     <ListItemIcon><PeopleIcon/></ListItemIcon>
                     <ListItemText primary="Liste Joueur"/>
                 </ListItem>
-                <ListItem button component={Link} to={ROUTES.TRAININGS} key="listPlayer">
+                <ListItem button component={Link} to={ROUTES.TRAININGS} key="trainings">
                     <ListItemIcon><AssignmentIcon/></ListItemIcon>
                     <ListItemText primary="Entrainements"/>
                 </ListItem>
-                <ListItem button component={Link} to={ROUTES.TACTICS} key="listPlayer">
+                <ListItem button component={Link} to={ROUTES.TACTICS} key="tactics">
                     <ListItemIcon><AssignmentIndIcon/></ListItemIcon>
                     <ListItemText primary="Tactiques"/>
                 </ListItem>
-                <ListItem button component={Link} to={ROUTES.BESTELEVEN} key="listPlayer">
+                <ListItem button component={Link} to={ROUTES.BESTELEVEN} key="bestXI">
                     <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Meilleur 11"/>
                 </ListItem>
-                <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="listPlayer">
+                <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="tacticsComparator">
                     <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Comparateur Tactique"/>
                 </ListItem>
