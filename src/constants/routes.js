@@ -8,3 +8,4 @@ export const INPUTTACTICS = '/tactics/:id';
 export const BESTELEVEN = '/best-eleven';
 export const GAMERECORDS = '/game-records';
 export const INPUTGAMERECORDS = '/new-game-record/:id';
+export const STATSGAMERECORDS = '/stats-game-record';

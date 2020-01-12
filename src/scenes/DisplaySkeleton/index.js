@@ -16,8 +16,11 @@ import PeopleIcon from '@material-ui/icons/People';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import SignOutButton from '../../components/SignOut';
 import * as ROUTES from "../../constants/routes";
@@ -61,10 +64,16 @@ function ResponsiveDrawer(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [tacticCompOpen, setTacticCompOpen]= React.useState(false);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
+
+    const handleOpenTacticComp = () => {
+        setTacticCompOpen(!tacticCompOpen);
+    }
+
 
     const drawer = (
         <div>
@@ -91,10 +100,25 @@ function ResponsiveDrawer(props) {
                     <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Meilleur 11"/>
                 </ListItem>
-                <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="tacticsComparator">
-                    <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
-                    <ListItemText primary="Comparateur Tactique"/>
+                <ListItem button onClick={handleOpenTacticComp}>
+                    <ListItemIcon>
+                        <PeopleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Comparateur Tactique" />
+                    {tacticCompOpen ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
+                <Collapse in={tacticCompOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                        <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="tacticsComparator">
+                            <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
+                            <ListItemText primary="Base de donnée"/>
+                        </ListItem>
+                        <ListItem button component={Link} to={ROUTES.STATSGAMERECORDS} key="statsGameRecord">
+                            <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
+                            <ListItemText primary="Stats"/>
+                        </ListItem>
+                    </List>
+                </Collapse>
             </List>
             <Divider />
             <List>

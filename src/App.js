@@ -13,6 +13,7 @@ import TacticsInput from "./scenes/Tactics/TacticsInputs";
 import BestEleven from "./scenes/BestEleven";
 import GameRecords from "./scenes/TacticComparator/GameRecords";
 import InputGameRecords from "./scenes/TacticComparator/InputGameRecord";
+import StatsGameRecord from "./scenes/TacticComparator/StatsGameRecord";
 import { withAuthentication } from './components/Session';
 import CustomisedSnackBar from "./components/SnackBarContent";
 import {useSelector, useDispatch} from "react-redux";
@@ -35,6 +36,7 @@ const App = () => {
                     <Route path={ROUTES.BESTELEVEN} exact component={BestEleven}/>
                     <Route path={ROUTES.GAMERECORDS} exact component={GameRecords}/>
                     <Route path={ROUTES.INPUTGAMERECORDS} component={InputGameRecords}/>
+                    <Route path={ROUTES.STATSGAMERECORDS} exact component={StatsGameRecord}/>
                 </Switch>
             </Router>
             {snackbarState.status ? <CustomisedSnackBar variant={snackbarState.status.category} open={snackbarState.status !== null} onClose={() => dispatch(snackbarOff())} message={snackbarState.status.msg} /> : null}
