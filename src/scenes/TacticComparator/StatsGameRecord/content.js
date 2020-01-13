@@ -7,18 +7,24 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { makeStyles } from '@material-ui/styles';
 import { useDispatch } from 'react-redux';
 import { snackbarOn } from '../../../actions';
+import WinLoseDrawWindow from "./components/WinLoseDrawWindow";
 
 const useStyles = makeStyles(theme => ({
   formControl: {
     minWidth: 120,
     width: '50%',
+    marginBottom: 20,
   },
+  boxesContainer: {
+    display: 'flex',
+  }
 }));
 
 const StatsGameRecord = () => {
   const [allTactics, setAllTactics] = React.useState(null);
   const [selectedTactic, setSelectedTactic] = React.useState('');
   const [gameRecords, setGameRecords] = React.useState(null);
+  const [newGameRecordLoaded, setNewGameRecordLoaded] = React.useState(false);
   const db = firebase.firestore();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -43,12 +49,13 @@ const StatsGameRecord = () => {
 
   const selectTacticOnChange = e => {
     setSelectedTactic(e.target.value);
-    handleGameRecords();
+    handleGameRecords(e.target.value);
   };
 
-  const handleGameRecords = () => {
-    db.collection('gameRecords')
-      .where('ownTactic', '==', selectedTactic)
+  const handleGameRecords = async (tacticTarget) => {
+    setNewGameRecordLoaded(false);
+    await db.collection('gameRecords')
+      .where('ownTactic', '==', tacticTarget)
       .get()
       .then(querySnapshot => {
         let nextState = {};
@@ -66,22 +73,24 @@ const StatsGameRecord = () => {
 
   const winLoseStats = () => {
     if (gameRecords != null) {
-      const recordTrack = [0, 0, 0]; // Win, Draw, Lose
+      let winLoseRecord = [0,0,0];
       for (const key in gameRecords) {
         const goalConceded = gameRecords[key].goalConceded;
         const goalScored = gameRecords[key].goalScored;
         if (goalScored > goalConceded) {
           // Game won
-          recordTrack[0] += 1;
+          winLoseRecord[0] += 1;
         } else if (goalScored < goalConceded) {
           // Game lost
-          recordTrack[2] += 1;
+          winLoseRecord[2] += 1;
         } else {
           // Draw
-          recordTrack[1] += 1;
+          winLoseRecord[1] += 1;
         }
       }
-      return recordTrack
+      return winLoseRecord
+    } else {
+      return [0,0,0]
     }
   };
 
@@ -103,6 +112,9 @@ const StatsGameRecord = () => {
           {getTacticList()}
         </Select>
       </FormControl>
+      <div>
+        {gameRecords != null ? <WinLoseDrawWindow winLoseStats={winLoseStats()} /> : null}
+      </div>
     </React.Fragment>
   );
 };
