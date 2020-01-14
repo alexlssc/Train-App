@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/styles';
 import { useDispatch } from 'react-redux';
 import { snackbarOn } from '../../../actions';
 import WinLoseDrawWindow from "./components/WinLoseDrawWindow";
+import AvgGoalWindow from "./components/AvgGoalWindow";
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -17,6 +18,7 @@ const useStyles = makeStyles(theme => ({
   },
   boxesContainer: {
     display: 'flex',
+    justifyContent: 'space-between'
   }
 }));
 
@@ -24,7 +26,6 @@ const StatsGameRecord = () => {
   const [allTactics, setAllTactics] = React.useState(null);
   const [selectedTactic, setSelectedTactic] = React.useState('');
   const [gameRecords, setGameRecords] = React.useState(null);
-  const [newGameRecordLoaded, setNewGameRecordLoaded] = React.useState(false);
   const db = firebase.firestore();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -53,7 +54,6 @@ const StatsGameRecord = () => {
   };
 
   const handleGameRecords = async (tacticTarget) => {
-    setNewGameRecordLoaded(false);
     await db.collection('gameRecords')
       .where('ownTactic', '==', tacticTarget)
       .get()
@@ -74,7 +74,7 @@ const StatsGameRecord = () => {
   const winLoseStats = () => {
     if (gameRecords != null) {
       let winLoseRecord = [0,0,0];
-      for (const key in gameRecords) {
+      for (let key in gameRecords) {
         const goalConceded = gameRecords[key].goalConceded;
         const goalScored = gameRecords[key].goalScored;
         if (goalScored > goalConceded) {
@@ -91,6 +91,23 @@ const StatsGameRecord = () => {
       return winLoseRecord
     } else {
       return [0,0,0]
+    }
+  };
+
+  const avgGoalStats = () => {
+    if(gameRecords != null) {
+      let overallGoalScored = 0;
+      let overallGoalConceded = 0;
+      let gameCounter = 0;
+      for(let key in gameRecords) {
+        overallGoalConceded += Number(gameRecords[key].goalConceded);
+        overallGoalScored += Number(gameRecords[key].goalScored);
+        gameCounter += 1
+      }
+      return [
+          overallGoalScored / gameCounter,
+          overallGoalConceded / gameCounter
+      ]
     }
   };
 
@@ -112,8 +129,9 @@ const StatsGameRecord = () => {
           {getTacticList()}
         </Select>
       </FormControl>
-      <div>
+      <div className={classes.boxesContainer}>
         {gameRecords != null ? <WinLoseDrawWindow winLoseStats={winLoseStats()} /> : null}
+        {gameRecords != null ? <AvgGoalWindow avgGoalStats={avgGoalStats()} /> : null}
       </div>
     </React.Fragment>
   );

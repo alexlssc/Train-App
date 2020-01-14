@@ -30,7 +30,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const WinLoseDrawWindow = props => {
-    const [canLoad, setCanLoad] = React.useState(true);
     const {winLoseStats} = props;
     const classes = useStyles();
     const totalNbOfMatch = winLoseStats[0] + winLoseStats[1] + winLoseStats[2];
