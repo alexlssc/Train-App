@@ -47,84 +47,98 @@ const TacticComparatorTable = props => {
     setOrderBy(property);
   };
 
-    // Format date to dd/MM/yyyy
-    function rightFormatDate(oldDate){
-        try{
-            const dateParts = oldDate.split('/');
-            return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-        } catch (e) {
-            return null
-        }
+  // Format date to dd/MM/yyyy
+  function rightFormatDate(oldDate) {
+    try {
+      const dateParts = oldDate.split('/');
+      return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+    } catch (e) {
+      return null;
     }
+  }
 
   const displayRows = () => {
     if (gameRecords != null && allTactics != null) {
       const output = Object.entries(gameRecords)
-          .sort((a, b) => {
-              if(order === 'asc'){
-                  if(orderBy === 'opponent'){
-                      return a[1][orderBy]['name'].localeCompare(b[1][orderBy]['name'])
-                  }
-                  else if (orderBy === 'ownTactic' || orderBy === 'opponentTactic'){
-                      return allTactics[a[1][orderBy]]['name'].localeCompare(allTactics[b[1][orderBy]]['name'])
-                  }
-                  else {
-                      return new Date(rightFormatDate(a[1][orderBy])) - new Date(rightFormatDate(b[1][orderBy]));
-                  }
-              } else {
-                  if(orderBy === 'opponent'){
-                      return b[1][orderBy]['name'].localeCompare(a[1][orderBy]['name'])
-                  }
-                  else if (orderBy === 'ownTactic' || orderBy === 'opponentTactic'){
-                      return allTactics[b[1][orderBy]]['name'].localeCompare(allTactics[a[1][orderBy]]['name'])
-                  }
-                  else {
-                      return new Date(rightFormatDate(b[1][orderBy])) - new Date(rightFormatDate(a[1][orderBy]));
-                  }
-              }
-          })
-          .map(([key, object]) => (
-        <TableRow key={key}>
-          <TableCell>{object.date}</TableCell>
-          <TableCell align={'right'}>
-            {object.opponent != null ? object.opponent.name : 'NaN'}
-          </TableCell>
-          <TableCell align={'right'}>
-            {allTactics[object.ownTactic] != null
-              ? allTactics[object.ownTactic].name
-              : 'NaN'}
-          </TableCell>
-          <TableCell align={'right'}>
-            {allTactics[object.opponentTactic] != null
-              ? allTactics[object.opponentTactic].name
-              : 'NaN'}
-          </TableCell>
-          <TableCell align={'right'}>
-            <ColouredScore
-              goalScored={object.goalScored}
-              goalConceded={object.goalConceded}
-            />
-          </TableCell>
-          <TableCell align={'right'} style={{ width: 50 }}>
-            <Link to={'/new-game-record/' + key}>
-              <IconButton aria-label="edit">
-                <EditIcon />
+        .sort((a, b) => {
+          if (order === 'asc') {
+            if (orderBy === 'opponent') {
+              return a[1][orderBy]['name'].localeCompare(b[1][orderBy]['name']);
+            } else if (
+              orderBy === 'ownTactic' ||
+              orderBy === 'opponentTactic'
+            ) {
+              return allTactics[a[1][orderBy]]['name'].localeCompare(
+                allTactics[b[1][orderBy]]['name'],
+              );
+            } else {
+              return (
+                new Date(rightFormatDate(a[1][orderBy])) -
+                new Date(rightFormatDate(b[1][orderBy]))
+              );
+            }
+          } else {
+            if (orderBy === 'opponent') {
+              return b[1][orderBy]['name'].localeCompare(a[1][orderBy]['name']);
+            } else if (
+              orderBy === 'ownTactic' ||
+              orderBy === 'opponentTactic'
+            ) {
+              return allTactics[b[1][orderBy]]['name'].localeCompare(
+                allTactics[a[1][orderBy]]['name'],
+              );
+            } else {
+              return (
+                new Date(rightFormatDate(b[1][orderBy])) -
+                new Date(rightFormatDate(a[1][orderBy]))
+              );
+            }
+          }
+        })
+        .map(([key, object]) => (
+          <TableRow key={key}>
+            <TableCell>{object.date}</TableCell>
+            <TableCell align={'right'}>
+              {object.opponent != null ? object.opponent.name : 'NaN'}
+            </TableCell>
+            <TableCell align={'right'}>
+              {allTactics[object.ownTactic] != null
+                ? allTactics[object.ownTactic].name
+                : 'NaN'}
+            </TableCell>
+            <TableCell align={'right'}>
+              {allTactics[object.opponentTactic] != null
+                ? allTactics[object.opponentTactic].name
+                : 'NaN'}
+            </TableCell>
+            <TableCell align={'right'}>
+              <ColouredScore
+                goalScored={object.goalScored}
+                goalConceded={object.goalConceded}
+              />
+            </TableCell>
+            <TableCell align={'right'} style={{ width: 50 }}>
+              <Link to={'/new-game-record/' + key}>
+                <IconButton aria-label="edit">
+                  <EditIcon />
+                </IconButton>
+              </Link>
+            </TableCell>
+            <TableCell align={'right'} style={{ width: 50 }}>
+              <IconButton
+                aria-label="delete"
+                onClick={() => {
+                  if (
+                    window.confirm('Voulez-vous vraiment supprimer ce match?')
+                  )
+                    deleteHandler(key);
+                }}
+              >
+                <DeleteIcon />
               </IconButton>
-            </Link>
-          </TableCell>
-          <TableCell align={'right'} style={{ width: 50 }}>
-            <IconButton
-              aria-label="delete"
-              onClick={() => {
-                if (window.confirm('Voulez-vous vraiment supprimer ce match?'))
-                  deleteHandler(key);
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ));
+            </TableCell>
+          </TableRow>
+        ));
       return output;
     }
   };

@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
   },
   formContainer: {
     display: 'flex',
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     justifyContent: 'space-between',
   },
 }));
@@ -31,8 +31,12 @@ const RecentFormWindow = props => {
 
   const allRecentForm = () => {
     let output = [];
-    for (const key in recentFormStats) {
-      output.push(<FormSquareDisplay oneResultData={recentFormStats[key]} />);
+    for (const key in recentFormStats.reverse()) {
+      if(output.length < 5){
+        output.push(<FormSquareDisplay oneResultData={recentFormStats[key]} />);
+      } else {
+        break;
+      }
     }
     while (output.length < 5) {
       output.push(<FormSquareDisplay oneResultData={null} />);
