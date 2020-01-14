@@ -42,19 +42,19 @@ const WinLoseDrawWindow = props => {
                 </Typography>
                 <div>
                     <p className={classes.victoryText}>
-                        <span className={classes.number}>{winLoseStats[0] / totalNbOfMatch * 100}</span> % de victoire
+                        <span className={classes.number}>{(winLoseStats[0] / totalNbOfMatch * 100).toFixed(1)}</span> % de victoire
                     </p>
                 </div>
                 <Divider/>
                 <div>
                     <p className={classes.drawText}>
-                        <span className={classes.number}>{winLoseStats[1] / totalNbOfMatch * 100}</span> % de nul
+                        <span className={classes.number}>{(winLoseStats[1] / totalNbOfMatch * 100).toFixed(1)}</span> % de nul
                     </p>
                 </div>
                 <Divider/>
                 <div>
                     <p className={classes.loseText}>
-                        <span className={classes.number}>{winLoseStats[2] / totalNbOfMatch * 100}</span> % de défaite
+                        <span className={classes.number}>{(winLoseStats[2] / totalNbOfMatch * 100).toFixed(1)}</span> % de défaite
                     </p>
                 </div>
                 <Divider/>
