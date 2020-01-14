@@ -228,8 +228,7 @@ const PlayerTable = () => {
                     return a[1][orderBy].localeCompare(b[1][orderBy]);
                   } else {
                     return (
-                      _calculateAge(a[1][orderBy]) -
-                      _calculateAge(b[1][orderBy])
+                      _calculateAge(a[1][orderBy]) - _calculateAge(b[1][orderBy])
                     );
                   }
                 } else {
@@ -237,8 +236,7 @@ const PlayerTable = () => {
                     return b[1][orderBy].localeCompare(a[1][orderBy]);
                   } else {
                     return (
-                      _calculateAge(b[1][orderBy]) -
-                      _calculateAge(a[1][orderBy])
+                      _calculateAge(b[1][orderBy]) - _calculateAge(a[1][orderBy])
                     );
                   }
                 }
