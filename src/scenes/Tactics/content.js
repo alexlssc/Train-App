@@ -6,8 +6,7 @@ import {useDispatch} from "react-redux";
 import {snackbarOn} from "../../actions";
 import firebase from "firebase";
 import { useHistory } from "react-router-dom";
-
-
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles({
     button: {
@@ -62,18 +61,22 @@ const TacticsContent = () => {
     }, []);
 
     return (
-        <div>
-            <TacticsTable tactics={tactics.tactics} deleteTactic={handleRemoveTactics}/>
-            <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddCircleIcon/>}
-                className={classes.button}
-                onClick={() => handleNewTactics()}
-            >
-                Ajouter
-            </Button>
-        </div>
+        <React.Fragment>
+            {tactics.tactics !== '' ? (
+                <React.Fragment>
+                    <TacticsTable tactics={tactics.tactics} deleteTactic={handleRemoveTactics}/>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddCircleIcon/>}
+                        className={classes.button}
+                        onClick={() => handleNewTactics()}
+                    >
+                        Ajouter
+                    </Button>
+                </React.Fragment>
+            ) : <CircularProgress className={classes.spinner}/> }
+        </React.Fragment>
     )
 };
 

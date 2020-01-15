@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import Modal from './components/Modal';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {makeStyles} from "@material-ui/styles";
+import Fade from '@material-ui/core/Fade';
 
 const useStyles = makeStyles(theme => ({
     spinner: {
