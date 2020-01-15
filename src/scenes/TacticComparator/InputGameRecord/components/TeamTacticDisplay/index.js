@@ -54,6 +54,7 @@ const TeamTacticDisplay = props => {
         if(targetTeamSelectedTactic != null){
             return (
                 POSITIONS.POSITION.map(position => (
+                    // eslint-disable-next-line
                     Object.entries(allTactics[targetTeamSelectedTactic].positions).map(([objectPosition, nb]) => {
                         if(position === objectPosition){
                             return listRow(objectPosition, nb);

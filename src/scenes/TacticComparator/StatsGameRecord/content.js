@@ -41,10 +41,20 @@ const StatsGameRecord = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  // Format date to dd/MM/yyyy
+  function rightFormatDate(oldDate) {
+    try {
+      const dateParts = oldDate.split('/');
+      return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+    } catch (e) {
+      return null;
+    }
+  }
+
   const getTacticList = () => {
     if (allTactics != null) {
       return Object.entries(allTactics).map(([key, value]) => (
-        <MenuItem value={key}>{value.name}</MenuItem>
+        <MenuItem key={key} value={key}>{value.name}</MenuItem>
       ));
     }
   };
@@ -192,7 +202,11 @@ const StatsGameRecord = () => {
   const recentFormStats = () => {
     let output = [];
     if (gameRecords != null) {
-      for (let key in gameRecords) {
+      const sortedList = Object.keys(gameRecords).sort((a,b) => {
+        return new Date(rightFormatDate(gameRecords[b]['date'])) - new Date(rightFormatDate(gameRecords[a]['date']))
+      });
+
+      for (let key of sortedList) {
         const goalScored = gameRecords[key].goalScored;
         const goalConceded = gameRecords[key].goalConceded;
         const opponent = gameRecords[key].opponent.id;

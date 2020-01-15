@@ -100,7 +100,7 @@ function ResponsiveDrawer(props) {
                     <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
                     <ListItemText primary="Meilleur 11"/>
                 </ListItem>
-                <ListItem button onClick={handleOpenTacticComp}>
+                <ListItem button onClick={handleOpenTacticComp} key="tacticCollapser">
                     <ListItemIcon>
                         <PeopleIcon />
                     </ListItemIcon>

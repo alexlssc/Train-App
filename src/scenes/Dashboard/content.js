@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/styles';
 import firebase from 'firebase';
 import * as POSITIONS from '../../constants/positions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Fade from '@material-ui/core/Fade';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -158,6 +157,7 @@ const DashboardContent = () => {
         //Display box only if there are players to display
         output.push(
           <BoxBestPlayer
+            key={index}
             topic={`MEILLEURS ${POSITIONS.POSITION[index]}`}
             bestPlayer={
               oneThreeBest.length !== 0 ? allPlayers[oneThreeBest[0]] : null

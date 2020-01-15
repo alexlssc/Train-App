@@ -17,6 +17,7 @@ class Firebase {
     constructor(){
         app.initializeApp(config);
         this.auth = app.auth();
+        // eslint-disable-next-line
         const performance = firebase.performance();
     }
 

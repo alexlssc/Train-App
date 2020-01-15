@@ -12,8 +12,6 @@ import {snackbarOn} from "../../../actions";
 import{useDispatch} from "react-redux";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import {Button} from "@material-ui/core";
-import DateFnsUtils from "@date-io/date-fns";
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DatePicker from "../../../components/DatePicker";
 
 const useStyles = makeStyles({

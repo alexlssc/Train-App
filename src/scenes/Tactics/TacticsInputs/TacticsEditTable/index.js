@@ -43,6 +43,7 @@ const TacticsEditTable = props => {
     const tacticBody = () => {
         return (
             POSITIONS.POSITION.map(position => (
+                // eslint-disable-next-line
                 Object.entries(props.listPositions).map(([objectPosition, nb]) => {
                     if(position === objectPosition){
                         return tacticRow(objectPosition, nb);

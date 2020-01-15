@@ -73,8 +73,7 @@ const TacticComparatorTable = props => {
               );
             } else {
               return (
-                new Date(rightFormatDate(a[1][orderBy])) -
-                new Date(rightFormatDate(b[1][orderBy]))
+                new Date(rightFormatDate(a[1][orderBy])) - new Date(rightFormatDate(b[1][orderBy]))
               );
             }
           } else {
