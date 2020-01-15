@@ -6,15 +6,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import firebase from 'firebase';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import Modal from './Modal';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { snackbarOn } from '../../actions';
 
 const useStyles = makeStyles({
   root: {
@@ -120,83 +116,18 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-const PlayerTable = () => {
-  const classes = useStyles();
-  const dispatch = useDispatch();
+const PlayerTable = props => {
+  const { listPlayers, handleOpen, handleRemovePlayer } = props;
 
+  const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('lastName');
-
-  const initial_state = { player: '' };
-  const [listPlayers, setListPlayers] = React.useState(initial_state);
-  const [playerEdit, setPlayerEdit] = React.useState({ player: '' });
-  const [keyPlayerEdit, setKeyPlayerEdit] = React.useState('');
 
   const handleRequestSort = (event, property) => {
     const isDesc = orderBy === property && order === 'desc';
     setOrder(isDesc ? 'asc' : 'desc');
     setOrderBy(property);
   };
-
-  // handle opening and closing of modal window
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = (playerObject, key) => {
-    setPlayerEdit(playerObject);
-    setKeyPlayerEdit(key);
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-    setPlayerEdit('');
-    setKeyPlayerEdit('');
-  };
-
-  const db = firebase.firestore();
-
-  const handleRemovePlayer = async key => {
-    try {
-      await listPlayers.player[key].trainingsAttended.forEach(trainingId => {
-        db.collection('trainings')
-          .doc(trainingId)
-          .set(
-            {
-              playerAttendees: {
-                [key]: firebase.firestore.FieldValue.delete(),
-              },
-            },
-            { merge: true },
-          );
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    await db
-      .collection('players')
-      .doc(key)
-      .delete()
-      .then(dispatch(snackbarOn('Joueur enlevé', 'success', new Date())))
-      .catch(err => {
-        dispatch(snackbarOn('Erreur: ' + err, 'error', new Date()));
-      });
-  };
-
-  const playerHandler = () => {
-    db.collection('players').onSnapshot(querySnapshot => {
-      let nextState = {};
-      querySnapshot.forEach(doc => {
-        nextState = { ...nextState, [doc.id]: doc.data() };
-      });
-      setListPlayers(prevState => ({
-        player: nextState,
-      }));
-    });
-  };
-
-  React.useEffect(() => {
-    playerHandler();
-    // eslint-disable-next-line
-  }, []);
 
   function _calculateAge(birthday) {
     const dateParts = birthday.split('/');
@@ -228,7 +159,8 @@ const PlayerTable = () => {
                     return a[1][orderBy].localeCompare(b[1][orderBy]);
                   } else {
                     return (
-                      _calculateAge(a[1][orderBy]) - _calculateAge(b[1][orderBy])
+                      _calculateAge(a[1][orderBy]) -
+                      _calculateAge(b[1][orderBy])
                     );
                   }
                 } else {
@@ -236,7 +168,8 @@ const PlayerTable = () => {
                     return b[1][orderBy].localeCompare(a[1][orderBy]);
                   } else {
                     return (
-                      _calculateAge(b[1][orderBy]) - _calculateAge(a[1][orderBy])
+                      _calculateAge(b[1][orderBy]) -
+                      _calculateAge(a[1][orderBy])
                     );
                   }
                 }
@@ -289,13 +222,6 @@ const PlayerTable = () => {
           </TableBody>
         </Table>
       </Paper>
-      <Modal
-        open={open}
-        handleOpen={() => handleOpen()}
-        handleClose={() => handleClose()}
-        playerEdit={playerEdit}
-        playerKey={keyPlayerEdit}
-      />
     </div>
   );
 };

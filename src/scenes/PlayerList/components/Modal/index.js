@@ -13,12 +13,12 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
-import * as POSITION from "../../../constants/positions";
+import * as POSITION from "../../../../constants/positions";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import firebase from "firebase";
 import {useDispatch} from "react-redux";
-import {snackbarOn} from "../../../actions";
+import {snackbarOn} from "../../../../actions";
 
 const useStyles = makeStyles(theme => ({
 

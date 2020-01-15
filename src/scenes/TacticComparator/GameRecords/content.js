@@ -7,13 +7,17 @@ import { useHistory } from 'react-router-dom';
 import firebase from 'firebase';
 import { useDispatch } from 'react-redux';
 import { snackbarOn } from '../../../actions';
-import DatePicker from '../../../components/DatePicker';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyle = makeStyles({
   button: {
-    marginTop: 20,
-    float: 'right',
+    marginBottom: 20,
   },
+  spinner: {
+    position: 'absolute',
+    left: '50vw',
+    top: '50vh',
+  }
 });
 
 const GameRecords = () => {
@@ -96,20 +100,23 @@ const GameRecords = () => {
 
   return (
     <React.Fragment>
-      <TacticComparatorTable
-        gameRecords={gameRecords}
-        deleteHandler={handleDeleteGameRecord}
-        allTactics={allTactics}
-      />
       <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddCircleIcon />}
-        className={classes.button}
-        onClick={() => handleNewGameRecord()}
+          variant="contained"
+          color="primary"
+          startIcon={<AddCircleIcon />}
+          className={classes.button}
+          onClick={() => handleNewGameRecord()}
       >
         Ajouter
       </Button>
+
+      {gameRecords != null ? (
+          <TacticComparatorTable
+              gameRecords={gameRecords}
+              deleteHandler={handleDeleteGameRecord}
+              allTactics={allTactics}
+          />
+      ) :  <CircularProgress className={classes.spinner}/>}
     </React.Fragment>
   );
 };
