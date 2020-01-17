@@ -92,22 +92,26 @@ const TrainingContent = () => {
   };
 
   const handleDeleteTrainings = async key => {
-    await Promise.all(
-      Object.keys(trainings.trainings[key].playerAttendees).map(
-        playerAttendee =>
-          db
-            .collection('players')
-            .doc(playerAttendee)
-            .set(
-              {
-                trainingsAttended: firebase.firestore.FieldValue.arrayRemove(
-                  key,
-                ),
-              },
-              { merge: true },
+    try {
+        await Promise.all(
+            Object.keys(trainings.trainings[key].playerAttendees).map(
+                playerAttendee =>
+                    db
+                        .collection('players')
+                        .doc(playerAttendee)
+                        .set(
+                            {
+                                trainingsAttended: firebase.firestore.FieldValue.arrayRemove(
+                                    key,
+                                ),
+                            },
+                            { merge: true },
+                        ),
             ),
-      ),
-    );
+        );
+    } catch (e) {
+        console.error('No player attendees')
+    }
 
     await db
       .collection('trainings')
