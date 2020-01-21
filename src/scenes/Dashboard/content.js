@@ -4,12 +4,14 @@ import { makeStyles } from '@material-ui/styles';
 import firebase from 'firebase';
 import * as POSITIONS from '../../constants/positions';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import WeekMonthSwitch from "../../components/WeekMonthSwitch";
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
+    width: "100%"
   },
   spinner: {
     position: 'absolute',
@@ -25,6 +27,7 @@ const DashboardContent = () => {
   const [allAvgPerformances, setAllAvgPerformances] = useState(null);
   const [rankedPerformances, setRankedPerformances] = useState(null);
   const [rankedDone, setRankedDone] = useState(false);
+  const [displayWeekTraining, setDisplayWeekTrainings] = useState(true);
   const db = firebase.firestore();
   let allThreeBest = [];
 
@@ -51,6 +54,10 @@ const DashboardContent = () => {
     );
     let avg = sum / allPerformances.length;
     return Math.round(avg * 10) / 10;
+  };
+
+  const handleSwitchChange = () => {
+    setDisplayWeekTrainings(!displayWeekTraining, () => setRankedDone(false));
   };
 
   const handlePreparingIncomingData = () => {
@@ -122,9 +129,10 @@ const DashboardContent = () => {
   };
 
   const handleGetTrainings = async () => {
+    const targetDays = displayWeekTraining ? 7 : 31;
     const querySnapshot = await db
       .collection('trainings')
-      .where('dateStamp', '>=', rightFormatDate(getTargetDate(7)))
+      .where('dateStamp', '>=', rightFormatDate(getTargetDate(targetDays)))
       .get();
     try {
       let nextState = {};
@@ -194,14 +202,18 @@ const DashboardContent = () => {
     handleGetTrainings();
     handleGetPlayers();
     // eslint-disable-next-line
-  }, []);
+  }, [displayWeekTraining]);
 
   return (
-    <div>
+    <React.Fragment>
       {allPlayers != null && weekTrainings != null
         ? handlePreparingIncomingData()
         : null}
       <h1>Meilleurs performances sur les 7 derniers jours</h1>
+      <WeekMonthSwitch
+      switchValue={displayWeekTraining}
+      handleSwitchChange={handleSwitchChange}
+      />
       <div className={classes.root}>
         {rankedPerformances != null && allThreeBest.length !== 0 ? (
           <React.Fragment>
@@ -289,7 +301,7 @@ const DashboardContent = () => {
           <CircularProgress className={classes.spinner} />
         )}
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

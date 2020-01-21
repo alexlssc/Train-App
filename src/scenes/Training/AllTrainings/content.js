@@ -7,10 +7,14 @@ import { useHistory } from 'react-router-dom';
 import firebase from 'firebase';
 import { useDispatch } from 'react-redux';
 import { snackbarOn } from '../../../actions';
+import WeekMonthSwitch from '../../../components/WeekMonthSwitch';
 
 const useStyles = makeStyles({
   button: {
     marginTop: 20,
+    float: 'right',
+  },
+  switch: {
     float: 'right',
   },
 });
@@ -19,6 +23,7 @@ const TrainingContent = () => {
   const classes = useStyles();
 
   const [trainings, setTrainings] = useState({ trainings: '' });
+  const [displayWeekTraining, setDisplayWeekTrainings] = useState(true);
   const dispatch = useDispatch();
   const db = firebase.firestore();
   let history = useHistory();
@@ -48,18 +53,23 @@ const TrainingContent = () => {
     }
   }
 
+  const handleSwitchChange = () => {
+    setDisplayWeekTrainings(!displayWeekTraining);
+  };
   const trainingsHandler = () => {
+    const targetDays = displayWeekTraining ? 7 : 31;
     db.collection('trainings')
-      .where('dateStamp', '>=', rightFormatDate(getTargetDate(7)))
+      .where('dateStamp', '>=', rightFormatDate(getTargetDate(targetDays)))
       .onSnapshot(querySnapshot => {
         let nextState = {};
         querySnapshot.forEach(doc => {
           nextState = { ...nextState, [doc.id]: doc.data() };
         });
-        setTrainings({ trainings: nextState });
+        setTrainings(prevState => {
+          return { trainings: nextState };
+        });
       });
   };
-
   const handleNewTraining = () => {
     db.collection('trainings')
       .add({
@@ -93,24 +103,24 @@ const TrainingContent = () => {
 
   const handleDeleteTrainings = async key => {
     try {
-        await Promise.all(
-            Object.keys(trainings.trainings[key].playerAttendees).map(
-                playerAttendee =>
-                    db
-                        .collection('players')
-                        .doc(playerAttendee)
-                        .set(
-                            {
-                                trainingsAttended: firebase.firestore.FieldValue.arrayRemove(
-                                    key,
-                                ),
-                            },
-                            { merge: true },
-                        ),
-            ),
-        );
+      await Promise.all(
+        Object.keys(trainings.trainings[key].playerAttendees).map(
+          playerAttendee =>
+            db
+              .collection('players')
+              .doc(playerAttendee)
+              .set(
+                {
+                  trainingsAttended: firebase.firestore.FieldValue.arrayRemove(
+                    key,
+                  ),
+                },
+                { merge: true },
+              ),
+        ),
+      );
     } catch (e) {
-        console.error('No player attendees')
+      console.error('No player attendees');
     }
 
     await db
@@ -122,12 +132,17 @@ const TrainingContent = () => {
   React.useEffect(() => {
     trainingsHandler();
     // eslint-disable-next-line
-  }, []);
+  }, [displayWeekTraining]);
 
   return (
     <div>
-      <h1>Entraînement ces 7 derniers jours</h1>
+      <h1>Entraînement ces {displayWeekTraining ? 7 : 31} derniers jours</h1>
+      <WeekMonthSwitch
+        switchValue={displayWeekTraining}
+        handleSwitchChange={handleSwitchChange}
+      />
       <WeekTrainingTable
+        className={classes.switch}
         trainings={trainings.trainings}
         editHandler={handleEditTrainings}
         deleteHandler={handleDeleteTrainings}
@@ -137,7 +152,6 @@ const TrainingContent = () => {
         color="primary"
         startIcon={<AddCircleIcon />}
         className={classes.button}
-        //
         onClick={() => handleNewTraining()}
       >
         Ajouter
