@@ -4,14 +4,14 @@ import { makeStyles } from '@material-ui/styles';
 import firebase from 'firebase';
 import * as POSITIONS from '../../constants/positions';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import WeekMonthSwitch from "../../components/WeekMonthSwitch";
+import WeekMonthSwitch from '../../components/WeekMonthSwitch';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    width: "100%"
+    width: '100%',
   },
   spinner: {
     position: 'absolute',
@@ -57,7 +57,9 @@ const DashboardContent = () => {
   };
 
   const handleSwitchChange = () => {
-    setDisplayWeekTrainings(!displayWeekTraining, () => setRankedDone(false));
+    setDisplayWeekTrainings(() => {return !displayWeekTraining});
+    setAllPlayers(null);
+    setRankedDone(() => {return false});
   };
 
   const handlePreparingIncomingData = () => {
@@ -68,8 +70,8 @@ const DashboardContent = () => {
           return allAvgPerformances[a] - allAvgPerformances[b];
         })
         .reverse();
-      setRankedPerformances(playerSorted);
-      setAllAvgPerformances(allAvgPerformances);
+      setRankedPerformances(playerSorted, console.log('Performance changed :' + playerSorted));
+      setAllAvgPerformances(allAvgPerformances, console.log('All Avg Performances changed'));
       setRankedDone(true);
     } else {
       for (let position of POSITIONS.POSITION) {
@@ -77,7 +79,6 @@ const DashboardContent = () => {
       }
     }
   };
-
   const sortPlayerPerPositionPerPerformance = targetPosition => {
     let threeBestPlayer = Array(3);
     let count = 0;
@@ -209,14 +210,14 @@ const DashboardContent = () => {
       {allPlayers != null && weekTrainings != null
         ? handlePreparingIncomingData()
         : null}
-      <h1>Meilleurs performances sur les 7 derniers jours</h1>
-      <WeekMonthSwitch
-      switchValue={displayWeekTraining}
-      handleSwitchChange={handleSwitchChange}
-      />
-      <div className={classes.root}>
-        {rankedPerformances != null && allThreeBest.length !== 0 ? (
-          <React.Fragment>
+      {rankedPerformances != null && allThreeBest.length !== 0 ? (
+        <React.Fragment>
+          <h1>Meilleurs performances sur les {displayWeekTraining ? 7 : 31} derniers jours</h1>
+          <WeekMonthSwitch
+            switchValue={displayWeekTraining}
+            handleSwitchChange={handleSwitchChange}
+          />
+          <div className={classes.root}>
             <BoxBestPlayer
               topic="MEILLEURS PERFORMANCES"
               bestPlayer={
@@ -295,12 +296,12 @@ const DashboardContent = () => {
                   : null
               }
             />
-            {displayBoxes()}
-          </React.Fragment>
-        ) : (
-          <CircularProgress className={classes.spinner} />
-        )}
-      </div>
+            {displayBoxes()})
+          </div>
+        </React.Fragment>
+      ) : (
+        <CircularProgress className={classes.spinner} />
+      )}
     </React.Fragment>
   );
 };

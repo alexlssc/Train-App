@@ -11,15 +11,19 @@ import { makeStyles } from '@material-ui/styles';
 import { useDispatch } from 'react-redux';
 import { snackbarOn } from '../../actions';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import WeekMonthSwitch from "../../components/WeekMonthSwitch";
 
 const useStyles = makeStyles({
   form: {
     width: '100%',
+    clear: 'both'
   },
   select: {
     width: '100%',
   },
-
+  paperForm: {
+    clear: 'both'
+  },
   spinner: {
     position: 'absolute',
     left: '50%',
@@ -37,6 +41,7 @@ const BestElevenContent = () => {
   const [allAvgPerformances, setAllAvgPerformances] = useState(null);
   const [rankedPerformances, setRankedPerformances] = useState(null);
   const [rankedDone, setRankedDone] = useState(false);
+  const [displayWeekTraining, setDisplayWeekTrainings] = useState(true);
   const db = firebase.firestore();
   let allThreeBest = [];
 
@@ -63,6 +68,14 @@ const BestElevenContent = () => {
     );
     let avg = sum / allPerformances.length;
     return Math.round(avg * 10) / 10;
+  };
+
+  const handleSwitchChange = () => {
+    setDisplayWeekTrainings(() => {return !displayWeekTraining});
+    setAllPlayers(null);
+    setWeekTrainings(null);
+    setAllAvgPerformances(null);
+    setRankedDone(false);
   };
 
   const handlePreparingIncomingData = () => {
@@ -147,9 +160,10 @@ const BestElevenContent = () => {
   };
 
   const handleGetTrainings = async () => {
+    const targetDays = displayWeekTraining ? 7 : 31;
     const querySnapshot = await db
       .collection('trainings')
-      .where('dateStamp', '>=', rightFormatDate(getTargetDate(7)))
+      .where('dateStamp', '>=', rightFormatDate(getTargetDate(targetDays)))
       .get();
     try {
       let nextState = {};
@@ -189,12 +203,16 @@ const BestElevenContent = () => {
     }
   };
 
+  const handleGetAllData = async () => {
+    await handleGetPlayers();
+    await handleGetTrainings();
+    await handleGetTactics();
+  };
+
   React.useEffect(() => {
-    handleGetTactics();
-    handleGetTrainings();
-    handleGetPlayers();
+    handleGetAllData();
     // eslint-disable-next-line
-  }, []);
+  }, [displayWeekTraining]);
 
   return (
     <div>
@@ -206,8 +224,14 @@ const BestElevenContent = () => {
       allPlayers != null &&
       allAvgPerformances != null ? (
         <React.Fragment>
-          <h1>Meilleurs performances sur les 7 derniers jours</h1>
-          <Paper>
+          <h1>Meilleurs performances sur les {displayWeekTraining ? 7 : 31} derniers jours</h1>
+          <div>
+            <WeekMonthSwitch
+                switchValue={displayWeekTraining}
+                handleSwitchChange={handleSwitchChange}
+            />
+          </div>
+          <Paper className={classes.paperForm}>
             <FormControl variant="outlined" className={classes.form}>
               <InputLabel id="demo-simple-select-outlined-label">
                 Choisissez une formation
