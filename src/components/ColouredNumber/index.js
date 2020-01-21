@@ -52,9 +52,9 @@ const ColouredNumber = props => {
         variant = 'belowAverage'
     } else if (performance <= 2 && performance > 1.5){
         variant = 'bad';
-    } else if (performance <= 1.5 && performance >= 1){
+    } else if (performance <= 1.5 && performance >= 0.1){
         variant = 'terrible';
-    } else if (performance < 1){
+    } else if (performance < 0.1){
         variant = 'unknown';
     }
 

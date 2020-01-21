@@ -18,6 +18,9 @@ import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import StorageIcon from '@material-ui/icons/Storage';
+import ShowChartIcon from '@material-ui/icons/ShowChart';
+import FindInPageIcon from '@material-ui/icons/FindInPage';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Collapse from '@material-ui/core/Collapse';
@@ -86,7 +89,7 @@ function ResponsiveDrawer(props) {
                 </ListItem>
                 <ListItem button component={Link} to={ROUTES.PLAYER_LIST} key="listPlayer">
                     <ListItemIcon><PeopleIcon/></ListItemIcon>
-                    <ListItemText primary="Liste Joueur"/>
+                    <ListItemText primary="Liste de joueurs"/>
                 </ListItem>
                 <ListItem button component={Link} to={ROUTES.TRAININGS} key="trainings">
                     <ListItemIcon><AssignmentIcon/></ListItemIcon>
@@ -102,7 +105,7 @@ function ResponsiveDrawer(props) {
                 </ListItem>
                 <ListItem button onClick={handleOpenTacticComp} key="tacticCollapser">
                     <ListItemIcon>
-                        <PeopleIcon />
+                        <FindInPageIcon />
                     </ListItemIcon>
                     <ListItemText primary="Comparateur Tactique" />
                     {tacticCompOpen ? <ExpandLess /> : <ExpandMore />}
@@ -110,11 +113,11 @@ function ResponsiveDrawer(props) {
                 <Collapse in={tacticCompOpen} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                         <ListItem button component={Link} to={ROUTES.GAMERECORDS} key="tacticsComparator">
-                            <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
+                            <ListItemIcon><StorageIcon/></ListItemIcon>
                             <ListItemText primary="Base de donnée"/>
                         </ListItem>
                         <ListItem button component={Link} to={ROUTES.STATSGAMERECORDS} key="statsGameRecord">
-                            <ListItemIcon><AccessibilityNewIcon/></ListItemIcon>
+                            <ListItemIcon><ShowChartIcon/></ListItemIcon>
                             <ListItemText primary="Stats"/>
                         </ListItem>
                     </List>

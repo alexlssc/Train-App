@@ -9,7 +9,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 const SignOutButton = ({ firebase }) => (
     <ListItem button key="deconnexion" onClick={firebase.doSignOut}>
         <ListItemIcon><ExitToAppIcon/></ListItemIcon>
-        <ListItemText primary="Deconnexion" />
+        <ListItemText primary="Déconnexion" />
     </ListItem>
 );
 export default withFirebase(SignOutButton);
