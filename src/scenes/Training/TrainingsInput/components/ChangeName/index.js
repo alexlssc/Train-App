@@ -29,6 +29,7 @@ const ChangeName = props => {
                 label="Titre"
                 value={name}
                 onChange={e => handleChangeName(e)}
+                InputLabelProps={{ shrink: name !== ''}}
             />
             <Button
                 variant="contained"

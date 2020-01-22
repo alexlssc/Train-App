@@ -245,10 +245,10 @@ const StatsGameRecord = () => {
 
       <div className={classes.boxesContainer}>
         {gameRecords != null ? (
-          <WinLoseDrawWindow winLoseStats={winLoseStats()} />
+          <WinLoseDrawWindow winLoseStats={winLoseStats()} nbGames={Object.keys(gameRecords).length}/>
         ) : null}
         {gameRecords != null ? (
-          <AvgGoalWindow avgGoalStats={avgGoalStats()} />
+          <AvgGoalWindow avgGoalStats={avgGoalStats()} nbGames={Object.keys(gameRecords).length}/>
         ) : null}
         {gameRecords != null ? (
           <RecentFormWindow recentFormStats={recentFormStats()} />
@@ -274,10 +274,10 @@ const StatsGameRecord = () => {
           </FormControl>
           <div className={classes.boxesContainer}>
             {opponentGameRecords != null ? (
-              <WinLoseDrawWindow winLoseStats={opponentWinLoseStats()} />
+              <WinLoseDrawWindow winLoseStats={opponentWinLoseStats()} nbGames={Object.keys(opponentGameRecords).length} />
             ) : null}
             {opponentGameRecords != null ? (
-              <AvgGoalWindow avgGoalStats={opponentAvgGoalStats()} />
+              <AvgGoalWindow avgGoalStats={opponentAvgGoalStats()} nbGames={Object.keys(opponentGameRecords).length} />
             ) : null}
           </div>
         </React.Fragment>

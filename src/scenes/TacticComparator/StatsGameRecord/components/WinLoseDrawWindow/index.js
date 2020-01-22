@@ -26,11 +26,15 @@ const useStyles = makeStyles(theme => ({
     },
     loseText: {
         color: '#F44336'
+    },
+    nbGames: {
+        color: '#757575',
+        fontSize: 12
     }
 }));
 
 const WinLoseDrawWindow = props => {
-    const {winLoseStats} = props;
+    const {winLoseStats, nbGames} = props;
     const classes = useStyles();
     const totalNbOfMatch = winLoseStats[0] + winLoseStats[1] + winLoseStats[2];
 
@@ -39,6 +43,9 @@ const WinLoseDrawWindow = props => {
             <CardContent>
                 <Typography className={classes.title} color="textPrimary" gutterBottom>
                     Victoire / Nul / Défaite
+                    <span className={classes.nbGames}>
+                       {' (' + nbGames + ' matchs joué(s))'}
+                    </span>
                 </Typography>
                 <div>
                     <p className={classes.victoryText}>

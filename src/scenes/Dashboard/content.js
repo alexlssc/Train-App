@@ -70,8 +70,8 @@ const DashboardContent = () => {
           return allAvgPerformances[a] - allAvgPerformances[b];
         })
         .reverse();
-      setRankedPerformances(playerSorted, console.log('Performance changed :' + playerSorted));
-      setAllAvgPerformances(allAvgPerformances, console.log('All Avg Performances changed'));
+      setRankedPerformances(playerSorted);
+      setAllAvgPerformances(allAvgPerformances);
       setRankedDone(true);
     } else {
       for (let position of POSITIONS.POSITION) {
@@ -296,7 +296,7 @@ const DashboardContent = () => {
                   : null
               }
             />
-            {displayBoxes()})
+            {displayBoxes()}
           </div>
         </React.Fragment>
       ) : (
