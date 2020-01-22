@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import WeekTrainingTable from './WeekTrainingTable';
+import Index from './components/WeekTrainingTable';
 import { Button, makeStyles } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { Link } from 'react-router-dom';
@@ -141,7 +141,7 @@ const TrainingContent = () => {
         switchValue={displayWeekTraining}
         handleSwitchChange={handleSwitchChange}
       />
-      <WeekTrainingTable
+      <Index
         className={classes.switch}
         trainings={trainings.trainings}
         editHandler={handleEditTrainings}

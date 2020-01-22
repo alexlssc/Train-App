@@ -6,15 +6,15 @@ import { snackbarOn } from '../../actions';
 import { useDispatch } from 'react-redux';
 import Modal from './components/Modal';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {makeStyles} from "@material-ui/styles";
+import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles(theme => ({
-    spinner: {
-        position: 'absolute',
-        left: '50vw',
-        top: '50vh',
-    }
-}))
+  spinner: {
+    position: 'absolute',
+    left: '50vw',
+    top: '50vh',
+  },
+}));
 
 const PlayerList = () => {
   const dispatch = useDispatch();
@@ -86,16 +86,18 @@ const PlayerList = () => {
 
   return (
     <div>
-        {listPlayers.player !== '' ? (
-            <React.Fragment>
-                <PlayerTable
-                    listPlayers={listPlayers}
-                    handleOpen={handleOpen}
-                    handleRemovePlayer={handleRemovePlayer}
-                />
-                <AddButton />
-            </React.Fragment>
-        ) : <CircularProgress className={classes.spinner}/>}
+      {listPlayers.player !== '' ? (
+        <React.Fragment>
+          <PlayerTable
+            listPlayers={listPlayers}
+            handleOpen={handleOpen}
+            handleRemovePlayer={handleRemovePlayer}
+          />
+          <AddButton />
+        </React.Fragment>
+      ) : (
+        <CircularProgress className={classes.spinner} />
+      )}
       <Modal
         open={open}
         handleOpen={() => handleOpen()}
@@ -103,7 +105,6 @@ const PlayerList = () => {
         playerEdit={playerEdit}
         playerKey={keyPlayerEdit}
       />
-
     </div>
   );
 };

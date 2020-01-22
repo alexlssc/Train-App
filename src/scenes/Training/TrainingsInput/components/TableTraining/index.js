@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import Select from "react-select";
 import DeleteIcon from '@material-ui/icons/Delete'
 import IconButton from '@material-ui/core/IconButton';
-import * as RATINGS from '../../../../constants/ratings';
+import * as RATINGS from '../../../../../constants/ratings';
 
 const TableTraining = props => {
 
