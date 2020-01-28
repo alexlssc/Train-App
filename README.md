@@ -5,7 +5,7 @@ Train App is a web app allowing football coach to monitor their player performan
 ## Features
 
 ### Training Monitoring
-Train App uses a system of color to monitor their player performances.
+Train App uses a system of colour to monitor their player performances.
 ![training-image](readme_images/training.png)
 
 On their dashboard, coaches can see which player performed the best and the worst.
